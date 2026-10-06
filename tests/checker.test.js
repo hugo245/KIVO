@@ -95,3 +95,12 @@ main()
 `;
   assert.deepEqual(messages(src), []);
 });
+
+test("using an async result without await is a warning", () => {
+  const r = analyze("async func load() { return 1 }\nlet x = load()\nload()\nlet y = await load()\nfunc f() { return load() }", null);
+  assert.equal(r.diagnostics.length, 1);
+  assert.equal(r.diagnostics[0].severity, "warning");
+  assert.equal(r.diagnostics[0].line, 2);
+  assert.match(r.diagnostics[0].message, /"load" is an async func/);
+});
+

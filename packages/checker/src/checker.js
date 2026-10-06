@@ -236,6 +236,7 @@ class Checker {
         this.markDefined(s.name.name);
         break;
       case N.ExpressionStatement:
+        s.expression.resultUnused = true;
         this.expr(s.expression);
         break;
       case N.AssignmentStatement:
@@ -262,6 +263,7 @@ class Checker {
         break;
       case N.ReturnStatement:
         if (s.argument) {
+          s.argument.resultUnused = true; // returning an async result to the caller is fine
           this.expr(s.argument);
           const fn = this.fnStack[this.fnStack.length - 1];
           if (fn && fn.returnType && fn.returnType.type === N.TypeName && fn.returnType.name === "void" && s.argument.type !== N.NullLiteral) {
@@ -581,8 +583,11 @@ class Checker {
         this.expr(node.left);
         this.expr(node.right);
         return;
-      case N.UnaryExpression:
       case N.AwaitExpression:
+        node.argument.awaited = true;
+        this.expr(node.argument);
+        return;
+      case N.UnaryExpression:
         this.expr(node.argument);
         return;
       case N.RangeExpression:
@@ -604,6 +609,7 @@ class Checker {
         if (node.callee.type !== N.SuperMemberExpression) this.expr(node.callee);
         node.args.forEach((a) => this.expr(a.type === N.SpreadElement ? a.argument : a));
         this.callArity(node);
+        this.missingAwait(node);
         return;
       default:
         return;
@@ -664,6 +670,16 @@ class Checker {
         }
       }
     }
+  }
+
+  // let users = loadUsers()   where loadUsers is an async func
+  missingAwait(node) {
+    if (node.awaited || node.resultUnused || node.callee.type !== N.Identifier) return;
+    const found = this.scope.lookup(node.callee.name);
+    if (!found || found.sym.kind !== "func" || !found.sym.node || !found.sym.node.async) return;
+    const fn = this.fnStack[this.fnStack.length - 1];
+    const where = !fn || fn.async ? "" : `\n\nThe surrounding function must be async too:\n\n    async func ${fn.name || "name"}(...) { ... }`;
+    this.report(node, `"${node.callee.name}" is an async func, so this gives an async result instead of its value.`, `Wait for the value with await:\n\n    await ${this.text(node)}${where}`, { severity: "warning", kind: "type" });
   }
 
   classChain(cls) {

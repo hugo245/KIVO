@@ -164,11 +164,12 @@ async function cmdCheck(args) {
     out(reports.join("\n\n" + c.gray("─".repeat(40)) + "\n\n"));
     out();
   }
+  const warnings = `${warningCount} ${warningCount === 1 ? "warning" : "warnings"}`;
   if (errorCount) {
-    out(c.red(`✗ ${errorCount} ${errorCount === 1 ? "error" : "errors"}`) + (warningCount ? c.yellow(`, ${warningCount} warnings`) : ""));
+    out(c.red(`✗ ${errorCount} ${errorCount === 1 ? "error" : "errors"}`) + (warningCount ? c.yellow(`, ${warnings}`) : ""));
     return 1;
   }
-  out(c.green("✓ no errors") + (warningCount ? c.yellow(` (${warningCount} warnings)`) : ""));
+  out(c.green("✓ no errors") + (warningCount ? c.yellow(` (${warnings})`) : ""));
   return 0;
 }
 
