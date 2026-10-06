@@ -555,11 +555,6 @@ function call(f, args, l) {
   return callFunction(f, args, l, undefined);
 }
 
-function callOpt(f, args, l) {
-  if (f === null || f === undefined) return null;
-  return callFunction(f, args, l, undefined);
-}
-
 function callMethod(obj, key, args, l) {
   if (obj !== null && typeof obj === "object") {
     if (isPlainObject(obj) || obj[MODULE]) {
@@ -720,13 +715,6 @@ function spreadObject(v, l) {
   throw fail(`Cannot spread ${describeType(v)} into an object.`, l, "... inside { } works with objects.", "TypeError");
 }
 
-function object(entries) {
-  // entries: [key, value, key, value, ...] or spread markers
-  const out = {};
-  for (let i = 0; i < entries.length; i += 2) defineKey(out, entries[i], entries[i + 1]);
-  return out;
-}
-
 // ------------------------------------------------------------------ errors & types
 
 function toThrow(value, l) {
@@ -751,10 +739,6 @@ function typeRef(binding, name, l) {
   } catch (e) {
     throw locate(e, l);
   }
-}
-
-function awaitValue(v) {
-  return v;
 }
 
 module.exports = {
@@ -784,7 +768,6 @@ module.exports = {
   updateMember,
   updateIndex,
   call,
-  callOpt,
   callMethod,
   callMethodOpt,
   callFunction,
@@ -799,12 +782,10 @@ module.exports = {
   pairs,
   spreadArray,
   spreadObject,
-  object,
   toThrow,
   caught,
   checkType,
   typeRef,
-  awaitValue,
   fail,
   T: types.T,
   _setMethods(m) {
