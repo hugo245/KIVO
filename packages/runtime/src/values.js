@@ -58,6 +58,7 @@ class KivoClass {
     Object.defineProperty(this.proto, CLASS, { value: this });
     this.fieldNames = new Set([...(parent ? parent.fieldNames : []), ...fields.map((f) => f.name)]);
     this.constants = new Set([...(parent ? parent.constants : []), ...fields.filter((f) => f.constant).map((f) => f.name)]);
+    this.fieldTypes = new Map([...(parent ? parent.fieldTypes : []), ...fields.filter((f) => f.type).map((f) => [f.name, f.type])]);
   }
   findMethod(name) {
     for (let c = this; c; c = c.parent) {

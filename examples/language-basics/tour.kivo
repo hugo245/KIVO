@@ -1,0 +1,67 @@
+// A quick tour of KIVO. Run: kivo run tour.kivo
+import math
+import json
+
+// --- values
+let name = "KIVO"
+let version = 0.1
+let ready = true
+let nothing = null
+print("{name} {version} ready={ready} nothing={nothing}")
+
+// --- functions
+func area(radius: number) -> number {
+    return math.pi * radius * radius
+}
+
+let double = x => x * 2
+print("area: {math.round(area(2), 2)}, double: {double(21)}")
+
+// --- collections
+let scores = [72, 95, 88, 61]
+print("best: {scores.max()}, average: {scores.average()}")
+print("passed:", scores.filter(s => s >= 70).sort())
+
+let player = { name: "Hugo", level: 3, items: ["sword", "map"] }
+player.level += 1
+print("{player.name} is level {player.level} with {len(player.items)} items")
+
+// --- null safety
+let settings = { theme: "dark" }
+print("font size:", settings?.font?.size ?? 14)
+
+// --- classes
+class Counter {
+    let count = 0
+
+    func increment(by = 1) {
+        self.count += by
+        return self
+    }
+}
+
+let counter = Counter()
+counter.increment().increment(5)
+print("counter: {counter.count}")
+
+// --- errors
+func parseAge(text: string) -> int {
+    let age = text.toNumber()
+    if age == null {
+        throw "\"{text}\" is not a number"
+    }
+    return int(age)
+}
+
+for input in ["42", "forty-two"] {
+    try {
+        print("age:", parseAge(input))
+    } catch error {
+        print("error:", error.message)
+    }
+}
+
+// --- JSON
+// "{" starts interpolation, so literal braces in JSON text are escaped as \{
+let data = json.parse("""\{"users": [\{"name": "Alex"}, \{"name": "Sam"}]}""")
+print("users:", data.users.map(u => u.name).join(" and "))

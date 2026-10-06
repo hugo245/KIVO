@@ -16,6 +16,7 @@ func grade(score) {
     }
     return "F"
 }
+
 print(grade(95), grade(85), grade(72), grade(10))
 
 for i in 1..5 {

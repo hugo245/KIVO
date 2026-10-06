@@ -120,6 +120,17 @@ test("assignments and destructuring", () => {
   assert.deepEqual(d.target.properties.map((p) => [p.key, p.value.name]), [["name", "name"], ["coins", "c"]]);
 });
 
+test("an arrow followed by { key: ... } returns an object literal", () => {
+  const obj = parse("let f = x => { ok: true }").body[0].value;
+  assert.equal(obj.body.type, N.ObjectExpression);
+  const block = parse("let f = x => {\n    return x\n}").body[0].value;
+  assert.equal(block.body.type, N.Block);
+});
+
+test("new is explained", () => {
+  assert.throws(() => parse('let p = new Player("x")'), (e) => e.diagnostics[0].message === 'KIVO has no "new" keyword.');
+});
+
 test("method chains may continue on the next line", () => {
   const s = parse("let users = db.users\n    .where(1)\n    .get()").body[0];
   assert.equal(sexp(s.value), "(call (. (call (. (. db users) where) 1) get))");

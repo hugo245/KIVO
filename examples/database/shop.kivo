@@ -1,0 +1,49 @@
+// SQLite with KIVO's query builder. Values are always bound parameters.
+import database
+
+let db = database.sqlite(":memory:")
+
+db.exec("""
+    CREATE TABLE products (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        price REAL NOT NULL,
+        stock INTEGER NOT NULL
+    )
+    """)
+
+let products = db.table("products")
+
+for item in [
+    { name: "Keyboard", price: 49.99, stock: 12 },
+    { name: "Mouse", price: 19.5, stock: 0 },
+    { name: "Monitor", price: 189, stock: 3 },
+    { name: "Cable", price: 4.25, stock: 100 }
+] {
+    products.insert(item)
+}
+
+print("In stock, most expensive first:")
+for p in products.where("stock", ">", 0).orderBy("price", "desc").get() {
+    print("  {p.name}: ${p.price}")
+}
+
+let cheap = products.where("price", "<", 20).count()
+print("Products under $20: {cheap}")
+
+products.where({ name: "Mouse" }).update({ stock: 25 })
+print("Mouse stock: {products.find({ name: "Mouse" }).stock}")
+
+// Raw SQL is available too, with ? placeholders
+let total = db.get("SELECT SUM(price * stock) AS value FROM products").value
+print("Inventory value: ${total}")
+
+// Transactions roll back when an error is thrown
+try {
+    db.transaction(func() {
+        products.where({ name: "Cable" }).update({ stock: 0 })
+        throw "supplier cancelled"
+    })
+} catch error {
+    print("Rolled back ({error.message}), cables: {products.find({ name: "Cable" }).stock}")
+}

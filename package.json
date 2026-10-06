@@ -16,7 +16,7 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "kivo": "node packages/cli/bin/kivo.js",
-    "fmt:check": "node packages/cli/bin/kivo.js fmt --check examples tests/programs",
+    "fmt:check": "node packages/cli/bin/kivo.js fmt --check examples tests/programs/*.kivo tests/programs/lib",
     "vscode:build": "node scripts/build-vscode.js",
     "vscode:package": "node scripts/build-vscode.js --package",
     "vscode:install": "node scripts/build-vscode.js --install"

@@ -702,6 +702,7 @@ function documentSymbols(source, file) {
 function foldingRanges(source) {
   const ranges = [];
   const stack = [];
+  const regions = [];
   let line = 0;
   let i = 0;
   let lineCommentStart = -1;
@@ -719,7 +720,11 @@ function foldingRanges(source) {
     }
     if (ch === "/" && source[i + 1] === "/") {
       const lineStart = source.lastIndexOf("\n", i - 1) + 1;
-      if (/^\s*$/.test(source.slice(lineStart, i))) {
+      const lineEnd = source.indexOf("\n", i);
+      const commentText = source.slice(i, lineEnd < 0 ? source.length : lineEnd);
+      if (/^\/\/\s*#?region\b/.test(commentText)) regions.push(line);
+      else if (/^\/\/\s*#?endregion\b/.test(commentText) && regions.length) ranges.push({ startLine: regions.pop(), endLine: line, kind: "region" });
+      if (/^\s*$/.test(source.slice(lineStart, i)) && !/^\/\/\s*#?(end)?region\b/.test(commentText)) {
         if (lineCommentStart < 0 || lastLineComment !== line - 1) {
           flushComments();
           lineCommentStart = line;

@@ -14,5 +14,6 @@ print(head, tail)
 func minMax(items) {
     return [items.min(), items.max()]
 }
+
 let [low, high] = minMax([4, 9, 1])
 print(low, high)

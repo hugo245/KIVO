@@ -20,16 +20,19 @@ try {
 func total(items: [int]) -> int {
     return items.sum()
 }
+
 print(total([1, 2, 3]))
 
 func describe(value: string | int) -> string {
     return "value: {value}"
 }
+
 print(describe("x"), describe(5))
 
 func maybe(name: string?) -> string {
     return name ?? "anonymous"
 }
+
 print(maybe(null), maybe("hugo"))
 
 let mixed = [1, "two"]

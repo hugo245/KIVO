@@ -41,6 +41,7 @@ func safeDivide(a, b) {
         return null
     }
 }
+
 print(safeDivide(10, 2), safeDivide(1, 0))
 
 let user = null

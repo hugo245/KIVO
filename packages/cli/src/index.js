@@ -96,11 +96,26 @@ function loadCore() {
 
 // ---------------------------------------------------------------- commands
 
+// kivo run [file] [args...]
+// Inside a project, arguments that are not a file go to the program:
+//   kivo run add "Buy milk"   ->  runs the project entry with ["add", "Buy milk"]
 async function cmdRun(args) {
-  const [file, ...rest] = args[0] === "--" ? [undefined, ...args.slice(1)] : args;
-  const entry = resolveEntry(file && !file.startsWith("-") ? file : undefined);
-  const programArgs = file && file.startsWith("-") ? args : rest[0] === "--" ? rest.slice(1) : rest;
   const core = loadCore();
+  let entry;
+  let programArgs;
+  const first = args[0];
+  const looksLikeFile = first !== undefined && first !== "--" && !first.startsWith("-") && (first.endsWith(".kivo") || fs.existsSync(first));
+  if (looksLikeFile) {
+    entry = resolveEntry(first);
+    programArgs = args.slice(1);
+  } else if (first === undefined || first === "--" || core.findProjectRoot(process.cwd())) {
+    entry = resolveEntry(undefined);
+    programArgs = first === "--" ? args.slice(1) : args;
+  } else {
+    entry = resolveEntry(first); // reports a helpful "cannot find" error
+    programArgs = args.slice(1);
+  }
+  if (programArgs[0] === "--") programArgs = programArgs.slice(1);
   return core.runFile(entry, { args: programArgs, color: errColor });
 }
 

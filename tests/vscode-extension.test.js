@@ -89,7 +89,7 @@ function mockVscode() {
       },
       CompletionItemKind: new Proxy({}, { get: (_, k) => String(k) }),
       SymbolKind: new Proxy({}, { get: (_, k) => String(k) }),
-      FoldingRangeKind: { Comment: "comment" },
+      FoldingRangeKind: { Comment: "comment", Region: "region" },
       MarkdownString: class {
         constructor(value) {
           this.value = value;

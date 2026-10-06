@@ -1,0 +1,50 @@
+// A small command line todo app.
+//
+//   kivo run add "Buy milk"
+//   kivo run list
+//   kivo run done 1
+import process
+import env
+from "./todos.kivo" import TodoList, describe
+
+let list = TodoList(env.get("TODO_FILE", "todos.json"))
+let args = process.args
+let command = args.first() ?? "list"
+
+func usage() {
+    print("Usage:")
+    print("  todo add <title>   add a todo")
+    print("  todo list          show all todos")
+    print("  todo done <id>     mark a todo as done")
+}
+
+if command == "add" {
+    let title = args.slice(1).join(" ")
+    if title.isBlank() {
+        usage()
+        process.exit(1)
+    }
+    let todo = list.add(title)
+    print("Added {todo.id}: {todo.title}")
+} else if command == "list" {
+    if list.items.isEmpty() {
+        print("Nothing to do!")
+    }
+    for todo in list.items {
+        print(describe(todo))
+    }
+    print("{len(list.remaining())} remaining")
+} else if command == "done" {
+    let id = args[1]?.toNumber()
+    if id == null {
+        usage()
+        process.exit(1)
+    }
+    if list.complete(id) {
+        print("Completed {id}")
+    } else {
+        print("No todo with id {id}")
+    }
+} else {
+    usage()
+}

@@ -184,7 +184,7 @@ class Printer {
           return `from ${src} import ${s.specifiers.map((sp) => (sp.imported === sp.local.name ? sp.imported : `${sp.imported} as ${sp.local.name}`)).join(", ")}`;
         }
         const defaultAlias = s.isPath ? s.source.split("/").pop().replace(/\.kivo$/, "") : s.source.split(".").pop();
-        return `import ${src}${s.alias.name !== defaultAlias ? " as " + s.alias.name : ""}`;
+        return `import ${src}${s.isPath || s.alias.name !== defaultAlias ? " as " + s.alias.name : ""}`;
       }
       default:
         throw new Error(`formatter: unknown statement ${s.type}`);

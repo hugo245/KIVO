@@ -90,4 +90,6 @@ test("incomplete code still gets useful analysis", () => {
 test("folding ranges", () => {
   const ranges = ls.foldingRanges("func a() {\n    x\n}\n// one\n// two\n");
   assert.deepEqual(ranges.map((r) => [r.startLine, r.endLine]), [[0, 1], [3, 4]]);
+  const regions = ls.foldingRanges("// region setup\nlet a = 1\nlet b = 2\n// endregion\n");
+  assert.deepEqual(regions.map((r) => [r.startLine, r.endLine, r.kind]), [[0, 3, "region"]]);
 });

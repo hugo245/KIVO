@@ -966,6 +966,10 @@ class Parser {
       }
       case T.IDENTIFIER:
         if (this.peek().type === T.FAT_ARROW) return this.arrowFunction(false);
+        if (tok.value === "new" && this.peek().type === T.IDENTIFIER && !this.peek().newlineBefore) {
+          const cls = this.peek().value;
+          throw this.error('KIVO has no "new" keyword.', tok, `Create objects by calling the class:\n\n    ${cls}(...)`);
+        }
         this.advance();
         return this.identifierFrom(tok);
       case T.LEFT_PAREN:
@@ -1043,7 +1047,7 @@ class Parser {
     this.inAsync = isAsync;
     let body;
     let expression = false;
-    if (this.check(T.LEFT_BRACE)) {
+    if (this.check(T.LEFT_BRACE) && !this.objectLiteralAhead()) {
       body = this.block();
     } else {
       body = this.expression();
@@ -1053,6 +1057,17 @@ class Parser {
     this.loopDepth = savedLoop;
     this.functionDepth--;
     return this.node(N.FunctionExpression, { name: null, params, returnType: null, body, async: isAsync, arrow: true, expression }, start);
+  }
+
+  // After "=>", "{ key: ..." or "{ ...spread" is an object literal, not a block.
+  // (KIVO has no labels, so a block can never start with "name:".)
+  objectLiteralAhead() {
+    let i = 1;
+    while (this.peek(i).type === T.NEWLINE) i++;
+    const a = this.peek(i);
+    if (a.type === T.SPREAD) return true;
+    const b = this.peek(i + 1);
+    return (isNameLike(a) || a.type === T.STRING) && b.type === T.COLON;
   }
 
   functionExpression(isAsync, startOverride) {
@@ -1142,7 +1157,7 @@ class Parser {
       sub.inClass = this.inClass;
       const expr = sub.expression();
       if (!sub.check(T.EOF)) {
-        throw sub.error(`Unexpected ${describe(sub.current)} inside "{...}".`, sub.current, "Each {...} in a string holds one expression, like {user.name} or {count + 1}.");
+        throw sub.error(`Unexpected ${describe(sub.current)} inside "{...}".`, sub.current, 'Each {...} in a string holds one expression, like {user.name} or {count + 1}.\nTo write a literal brace (for example in JSON text), escape it: \\{');
       }
       return expr;
     });

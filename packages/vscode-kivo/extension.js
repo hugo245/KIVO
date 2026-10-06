@@ -187,7 +187,7 @@ const foldingProvider = {
     return service()
       .foldingRanges(document.getText())
       .filter((r) => r.endLine > r.startLine)
-      .map((r) => new vscode.FoldingRange(r.startLine, r.endLine, r.kind === "comment" ? vscode.FoldingRangeKind.Comment : undefined));
+      .map((r) => new vscode.FoldingRange(r.startLine, r.endLine, r.kind === "comment" ? vscode.FoldingRangeKind.Comment : r.kind === "region" ? vscode.FoldingRangeKind.Region : undefined));
   },
 };
 

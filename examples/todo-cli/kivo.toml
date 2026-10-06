@@ -1,0 +1,6 @@
+[project]
+name = "todo"
+version = "0.1.0"
+
+[run]
+entry = "src/main.kivo"

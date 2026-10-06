@@ -434,6 +434,8 @@ function set(obj, key, value, l) {
     if (cls.constants.has(key) && hasOwn.call(obj, key) && obj[READY]) {
       throw fail(`"${key}" is a const field of ${cls.name} and cannot be changed.`, l);
     }
+    const fieldType = cls.fieldTypes.get(key);
+    if (fieldType) checkType(value, fieldType, `Field "${key}" of ${cls.name}`, l);
     obj[key] = value;
     return;
   }

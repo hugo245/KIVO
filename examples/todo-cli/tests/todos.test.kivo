@@ -1,0 +1,22 @@
+import fs
+from testing import test, equal, ok
+from "../src/todos.kivo" import TodoList, describe
+
+let file = "test-todos.json"
+
+test("adds and completes todos", func() {
+    if fs.exists(file) {
+        fs.remove(file)
+    }
+    let list = TodoList(file)
+    list.add("Write tests")
+    list.add("Ship it")
+    equal(len(list.remaining()), 2)
+    ok(list.complete(1))
+    equal(len(list.remaining()), 1)
+    equal(describe(list.items[0]), "[x] 1. Write tests")
+
+    let reloaded = TodoList(file)
+    equal(len(reloaded.items), 2)
+    fs.remove(file)
+})

@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.kivo": "kivo"
+  },
+  "files.exclude": {
+    "packages/vscode-kivo/kivo": true
+  }
+}

@@ -1,0 +1,55 @@
+// Todo list storage: a JSON file with a list of todos.
+import fs
+import json
+
+export type Todo {
+    id: int
+    title: string
+    done: bool
+}
+
+export class TodoList {
+    let file: string
+    let items = []
+
+    func init(file: string) {
+        self.file = file
+        if fs.exists(file) {
+            self.items = json.parse(fs.read(file)).map(t => Todo(t))
+        }
+    }
+
+    func add(title: string) -> Todo {
+        let nextId = (self.items.map(t => t.id).max() ?? 0) + 1
+        let todo = { id: nextId, title: title, done: false }
+        self.items.push(todo)
+        self.save()
+        return todo
+    }
+
+    func complete(id: int) -> bool {
+        let todo = self.items.find(t => t.id == id)
+        if todo == null {
+            return false
+        }
+        todo.done = true
+        self.save()
+        return true
+    }
+
+    func remaining() {
+        return self.items.filter(t => not t.done)
+    }
+
+    func save() {
+        fs.write(self.file, json.pretty(self.items))
+    }
+}
+
+export func describe(todo) -> string {
+    let mark = "[ ]"
+    if todo.done {
+        mark = "[x]"
+    }
+    return "{mark} {todo.id}. {todo.title}"
+}
