@@ -54,3 +54,21 @@ try {
     ].join("\n")
   );
 });
+
+test("database: tables as properties, as in db.users.find(...)", async () => {
+  const r = await run(`
+import database
+let db = database.sqlite(":memory:")
+db.exec("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, coins INTEGER)")
+db.users.insert({ name: "Hugo", coins: 500 })
+let user = db.users.find({
+    id: 1
+})
+print(user.name, db.users.where("coins", ">", 100).limit(20).get().length)
+db.usres.all()
+`);
+  assert.equal(r.output, "Hugo 1\n");
+  assert.match(r.error, /no such table: usres/);
+  assert.match(r.error, /Did you mean "users"\?/);
+});
+

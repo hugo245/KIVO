@@ -403,5 +403,5 @@ import database
 
 | Member | Description |
 | --- | --- |
-| `database.sqlite(path: string) -> Database` | Opens (or creates) a SQLite database file. Use ":memory:" for a temporary in-memory database. |
+| `database.sqlite(path: string) -> Database` | Opens (or creates) a SQLite database file. Use ":memory:" for a temporary in-memory database. Tables are available as db.tableName. |
 

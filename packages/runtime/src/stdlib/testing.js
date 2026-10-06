@@ -1,7 +1,7 @@
 "use strict";
 
 const { native, defineModule } = require("../native");
-const { KivoError, typeError, fromJsError, locationOf, toDiagnostic } = require("../errors");
+const { KivoError, typeError, fromJsError, locationOf } = require("../errors");
 const { repr, equals, isPromise, describeType } = require("../values");
 const { displayPath, painter } = require("../../../diagnostics/src");
 const io = require("../io");
@@ -33,7 +33,6 @@ async function runAll(rt, { color = false } = {}) {
       io.write(`    ${e.message.split("\n").join("\n    ")}\n`);
       const loc = e.loc != null ? locationOf(e.loc) : null;
       if (loc) io.write(c.gray(`    at ${displayPath(loc.file)}:${loc.line}:${loc.column}\n`));
-      else void toDiagnostic;
     }
   }
   return { passed, failed, total: tests.length };

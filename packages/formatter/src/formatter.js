@@ -261,11 +261,9 @@ class Printer {
 
   // ---------------------------------------------------------- expressions
 
-  expr(node, parentPrec = 0) {
+  expr(node) {
     const text = this.exprInner(node);
-    if (node.parenthesized) return `(${text})`;
-    void parentPrec;
-    return text;
+    return node.parenthesized ? `(${text})` : text;
   }
 
   exprInner(node) {

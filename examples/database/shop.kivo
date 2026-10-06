@@ -12,7 +12,8 @@ db.exec("""
     )
     """)
 
-let products = db.table("products")
+// db.products is the "products" table (the same as db.table("products"))
+let products = db.products
 
 for item in [
     { name: "Keyboard", price: 49.99, stock: 12 },

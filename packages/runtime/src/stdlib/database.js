@@ -3,6 +3,7 @@
 const { native, defineModule } = require("../native");
 const { KivoError, typeError } = require("../errors");
 const { describeType, isPlainObject, isBytes, isPromise } = require("../values");
+const { suggest } = require("../../../diagnostics/src");
 
 // SQLite through Node's built-in driver. Every value is passed as a bound
 // parameter, and table/column names are validated, so the query builder
@@ -56,10 +57,20 @@ function params(p) {
   throw typeError(`Query parameters must be an array or an object, but got ${describeType(p)}.`, '    db.query("SELECT * FROM users WHERE id = ?", [5])');
 }
 
-function sqlError(err, sql) {
+function sqlError(err, sql, db) {
   if (err instanceof KivoError) return err;
   const e = new KivoError(`Database error: ${err.message.replace(/^SQLITE_\w+: /, "")}`, { kind: "DatabaseError" });
   e.hint = sql ? `While running:\n\n    ${sql}` : null;
+  const missing = /no such table: (\w+)/.exec(err.message);
+  if (missing && db) {
+    try {
+      const tables = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'").all().map((r) => r.name);
+      const close = suggest(missing[1], tables);
+      e.hint = close ? `Did you mean "${close}"?` : tables.length ? `Tables in this database: ${tables.join(", ")}` : "The database has no tables yet. Create one with db.exec(\"CREATE TABLE ...\").";
+    } catch {
+      /* keep the generic hint */
+    }
+  }
   return e;
 }
 
@@ -86,7 +97,7 @@ function openSqlite(rt, file) {
       const r = db.prepare(sql).run(...params(p));
       return { changes: Number(r.changes), lastId: Number(r.lastInsertRowid) };
     } catch (err) {
-      throw sqlError(err, sql);
+      throw sqlError(err, sql, db);
     }
   };
   const all = (sql, p) => {
@@ -94,7 +105,7 @@ function openSqlite(rt, file) {
     try {
       return db.prepare(sql).all(...params(p)).map(plainRow);
     } catch (err) {
-      throw sqlError(err, sql);
+      throw sqlError(err, sql, db);
     }
   };
   const one = (sql, p) => {
@@ -102,7 +113,7 @@ function openSqlite(rt, file) {
     try {
       return plainRow(db.prepare(sql).get(...params(p)));
     } catch (err) {
-      throw sqlError(err, sql);
+      throw sqlError(err, sql, db);
     }
   };
 
@@ -215,7 +226,7 @@ function openSqlite(rt, file) {
     };
   }
 
-  return {
+  const api = {
     query: native("query(sql: string, params?: array | object) -> [object]", 'Runs a SELECT and returns the rows. Use ? placeholders: db.query("SELECT * FROM users WHERE id = ?", [id])', all),
     get: native("get(sql: string, params?: array | object) -> object?", "Runs a query and returns the first row, or null.", one),
     run: native("run(sql: string, params?: array | object) -> object", "Runs INSERT/UPDATE/DELETE. Returns { changes, lastId }.", run),
@@ -224,7 +235,7 @@ function openSqlite(rt, file) {
       try {
         db.exec(sql);
       } catch (err) {
-        throw sqlError(err, sql.trim().split("\n")[0]);
+        throw sqlError(err, sql.trim().split("\n")[0], db);
       }
     }),
     table: native("table(name: string) -> Table", "A query builder for one table.", tableApi),
@@ -243,11 +254,28 @@ function openSqlite(rt, file) {
     }),
     close: native("close() -> void", "Closes the database.", () => db.close()),
   };
+  // db.users is a shortcut for db.table("users")
+  const tables = new Map();
+  return new Proxy(api, {
+    getOwnPropertyDescriptor(target, key) {
+      if (typeof key === "string" && !Object.prototype.hasOwnProperty.call(target, key) && IDENT.test(key)) {
+        return { value: undefined, writable: false, enumerable: false, configurable: true };
+      }
+      return Reflect.getOwnPropertyDescriptor(target, key);
+    },
+    get(target, key, receiver) {
+      if (typeof key === "string" && !Object.prototype.hasOwnProperty.call(target, key) && IDENT.test(key)) {
+        if (!tables.has(key)) tables.set(key, tableApi(key));
+        return tables.get(key);
+      }
+      return Reflect.get(target, key, receiver);
+    },
+  });
 }
 
 module.exports = (rt) =>
   defineModule("database", "SQL databases with safe, parameterized queries. Currently: SQLite.", {
-    sqlite: native("sqlite(path: string) -> Database", 'Opens (or creates) a SQLite database file. Use ":memory:" for a temporary in-memory database.', (file) => openSqlite(rt, file)),
+    sqlite: native("sqlite(path: string) -> Database", 'Opens (or creates) a SQLite database file. Use ":memory:" for a temporary in-memory database. Tables are available as db.tableName.', (file) => openSqlite(rt, file)),
   });
 
 // Member documentation for editor tooling (completion and hover).

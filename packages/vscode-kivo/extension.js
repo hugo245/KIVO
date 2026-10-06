@@ -8,10 +8,10 @@ const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
 
-// The toolchain is bundled into ./kivo when the extension is packaged, and
-// resolved from the monorepo when developing the extension.
+// When developing inside the monorepo the live toolchain is used; a packaged
+// extension carries its own copy in ./kivo (see scripts/build-vscode.js).
 function locateToolchain() {
-  const candidates = [path.join(__dirname, "kivo", "packages"), path.join(__dirname, "..")];
+  const candidates = [path.join(__dirname, ".."), path.join(__dirname, "kivo", "packages")];
   for (const base of candidates) {
     if (fs.existsSync(path.join(base, "language-service", "src", "index.js"))) {
       return { packages: base, cli: path.join(base, "cli", "bin", "kivo.js") };
@@ -263,10 +263,9 @@ function activate(context) {
     vscode.languages.registerDocumentFormattingEditProvider(selector, formattingProvider),
     vscode.workspace.onDidOpenTextDocument(refreshDiagnostics),
     vscode.workspace.onDidChangeTextDocument((e) => scheduleDiagnostics(e.document)),
-    vscode.workspace.onDidSaveTextDocument((doc) => {
+    vscode.workspace.onDidSaveTextDocument(() => {
       // re-check open files: an imported file may have changed
       for (const d of vscode.workspace.textDocuments) if (d.languageId === "kivo") scheduleDiagnostics(d);
-      void doc;
     }),
     vscode.workspace.onDidCloseTextDocument((doc) => diagnosticCollection.delete(doc.uri)),
     vscode.workspace.onDidChangeConfiguration((e) => {

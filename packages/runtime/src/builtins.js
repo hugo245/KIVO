@@ -26,7 +26,7 @@ function toNumber(v, fname) {
     return n;
   }
   if (typeof v === "boolean") {
-    throw typeError(`${fname}() cannot convert a bool.`, "Write the conversion explicitly:\n\n    let n = if flag { 1 } else { 0 }".replace("if flag { 1 } else { 0 }", "0\n    if flag {\n        n = 1\n    }"));
+    throw typeError(`${fname}() cannot convert a bool.`, "Write the conversion explicitly:\n\n    let n = 0\n    if flag {\n        n = 1\n    }");
   }
   throw typeError(`${fname}() cannot convert ${describeType(v)}.`, v === null ? "The value is null. Provide a default first:\n\n    number(value ?? \"0\")" : null);
 }

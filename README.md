@@ -281,7 +281,10 @@ A database is one import away:
 import database
 
 let db = database.sqlite("app.db")
-let users = db.table("users")
+
+let user = db.users.find({ id: 5 })
+
+let richest = db.users
     .where("coins", ">", 100)
     .orderBy("coins", "desc")
     .limit(20)

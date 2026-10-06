@@ -6,7 +6,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
-const { cli, ROOT } = require("./helpers");
+const { cli } = require("./helpers");
 
 function tmp() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "kivo-test-"));
@@ -103,5 +103,3 @@ test("local packages are imported by name", () => {
   const r = cli(["run"], { cwd: dir });
   assert.equal(r.stdout, "hi pkg\n", r.stderr);
 });
-
-void ROOT;

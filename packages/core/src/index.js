@@ -192,7 +192,12 @@ let fatalHandlersInstalled = false;
 function installFatalHandlers(color) {
   if (fatalHandlersInstalled) return;
   fatalHandlersInstalled = true;
+  // `kivo run app.kivo | head`: the reader went away, so stop quietly
+  process.stdout.on("error", (err) => {
+    if (err && err.code === "EPIPE") process.exit(0);
+  });
   const onFatal = (err) => {
+    if (err && err.code === "EPIPE") process.exit(0);
     runtime.io.writeError(formatError(err, { color }) + "\n");
     process.exitCode = 1;
     rt.exit(1);

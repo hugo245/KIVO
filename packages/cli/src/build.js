@@ -75,12 +75,12 @@ function collectModules(entry, core) {
       }
     }
   }
-  return { root, modules, resolveMap, packageMap, entryRel: rel(entry) };
+  return { modules, resolveMap, packageMap, entryRel: rel(entry) };
 }
 
 function build(entry, { output = null } = {}) {
   const core = require("../../core/src");
-  const { root, modules, resolveMap, packageMap, entryRel } = collectModules(entry, core);
+  const { modules, resolveMap, packageMap, entryRel } = collectModules(entry, core);
   const runtime = bundleRuntime();
   let name = path.basename(entry, ".kivo");
   const projectRoot = findProjectRoot(path.dirname(entry));
@@ -149,7 +149,11 @@ rt.loader = {
   },
 };
 const color = Boolean(process.stderr.isTTY) && !process.env.NO_COLOR;
+process.stdout.on("error", (err) => {
+  if (err && err.code === "EPIPE") process.exit(0);
+});
 const fatal = (err) => {
+  if (err && err.code === "EPIPE") process.exit(0);
   process.stderr.write(errors.formatRuntimeError(err, { color }) + "\\n");
   process.exit(1);
 };
@@ -167,7 +171,6 @@ load(${JSON.stringify(entryRel)})
 `;
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, program, { mode: 0o755 });
-  void root;
   return { output: outFile, size: Buffer.byteLength(program), modules: modules.map((m) => m.abs) };
 }
 

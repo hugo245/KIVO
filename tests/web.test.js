@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("path");
-const { core } = require("./helpers");
+const { core, run } = require("./helpers");
 
 // Starts a KIVO web app in-process on a random port.
 async function startApp(source) {
@@ -148,3 +148,36 @@ test("web framework: static files cannot escape their directory", async () => {
     restore();
   }
 });
+
+test("http client talks to a KIVO server", async () => {
+  const { app, restore } = await startApp(`
+import web
+export let app = web.app()
+app.get("/data", req => { items: [1, 2, 3], q: req.query.q ?? null })
+app.post("/echo", req => req.body)
+export let port = await app.listen(0)
+`);
+  try {
+    const port = app.port;
+    const r = await run(`
+import http
+let res = await http.get("http://127.0.0.1:${port}/data", { query: { q: "kivo" } })
+print(res.status, res.ok, res.json().items, res.json().q)
+let echo = await http.post("http://127.0.0.1:${port}/echo", { name: "Hugo" })
+print(echo.json().name, echo.headers["content-type"])
+let missing = await http.get("http://127.0.0.1:${port}/nope")
+print(missing.status, missing.ok)
+try {
+    await http.get("http://127.0.0.1:1/unreachable")
+} catch e {
+    print(e.kind)
+}
+`);
+    assert.equal(r.error, null, r.error);
+    assert.equal(r.output, "200 true [1, 2, 3] kivo\nHugo application/json; charset=utf-8\n404 false\nHttpError\n");
+  } finally {
+    await app.close();
+    restore();
+  }
+});
+

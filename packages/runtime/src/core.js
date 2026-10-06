@@ -352,13 +352,13 @@ function boundBuiltin(table, obj, key, l) {
   return bound;
 }
 
+// obj.method without calling it: a function that keeps `self` bound and has
+// the method's arity (so callbacks receive the right number of arguments).
 function bindMethod(m, self, l) {
-  const meta = m[META];
   const bound = function (...args) {
     return callFunction(m, args, l, self);
   };
-  bound[META] = { ...meta, bound: true, native: true, min: 0, max: Infinity };
-  void l;
+  bound[META] = { ...m[META], bound: true };
   return bound;
 }
 
