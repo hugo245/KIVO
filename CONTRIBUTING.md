@@ -25,6 +25,7 @@ Requires Node.js 20+ (22.5+ for the database module).
 | `packages/core` | compile + run pipeline, module loading |
 | `packages/formatter` | `kivo fmt` |
 | `packages/language-service` | editor intelligence |
+| `packages/language-server` | LSP server (`kivo lsp`) |
 | `packages/cli` | the `kivo` command |
 | `packages/vscode-kivo` | VS Code extension |
 | `tests/` | `node:test` suites; `tests/programs` holds end-to-end KIVO programs |

@@ -16,7 +16,7 @@ const { execFileSync } = require("child_process");
 const ROOT = path.resolve(__dirname, "..");
 const EXT = path.join(ROOT, "packages", "vscode-kivo");
 const BUNDLE = path.join(EXT, "kivo", "packages");
-const TOOLCHAIN = ["diagnostics", "lexer", "parser", "checker", "compiler", "runtime", "core", "formatter", "language-service", "cli"];
+const TOOLCHAIN = ["diagnostics", "lexer", "parser", "checker", "compiler", "runtime", "core", "formatter", "language-service", "language-server", "cli"];
 
 const manifest = JSON.parse(fs.readFileSync(path.join(EXT, "package.json"), "utf8"));
 const extId = `${manifest.publisher}.${manifest.name}`;

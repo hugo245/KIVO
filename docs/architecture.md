@@ -23,6 +23,7 @@ KIVO 0.1 is a compiler to JavaScript plus a runtime, running on Node.js. This do
  cli               packages/cli               the `kivo` command, `kivo build` bundler
  formatter         packages/formatter         AST → canonical source
  language-service  packages/language-service  completion, hover, definitions (editor-agnostic)
+ language-server   packages/language-server   LSP over stdio (`kivo lsp`)
  vscode-kivo       packages/vscode-kivo       VS Code adapter, grammar, icon
  diagnostics       packages/diagnostics       shared Diagnostic type and error rendering
 ```
@@ -85,7 +86,7 @@ Signatures and docs live next to the implementation (`native("read(path: string)
 
 ## Editor tooling
 
-`language-service` exposes offset-based functions (`completions`, `hover`, `definition`, `signatureHelp`, `diagnostics`, `documentSymbols`, `foldingRanges`, `format`). The VS Code extension is a thin adapter. A Language Server Protocol server for other editors is a thin wrapper around the same functions (planned for 0.2).
+`language-service` exposes offset-based functions (`completions`, `hover`, `definition`, `signatureHelp`, `diagnostics`, `documentSymbols`, `foldingRanges`, `format`). Both the VS Code extension and the LSP server (`language-server`, started with `kivo lsp`) are thin adapters around it.
 
 ## Evolving beyond 0.1
 

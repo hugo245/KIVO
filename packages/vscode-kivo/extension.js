@@ -118,7 +118,7 @@ const completionProvider = {
         ci.detail = ci.detail || `${item.label} snippet`;
       }
       if (item.autoImport) {
-        const line = importInsertLine(document);
+        const line = service().importInsertLine(document.getText());
         ci.additionalTextEdits = [vscode.TextEdit.insert(new vscode.Position(line, 0), item.autoImport + "\n")];
         ci.detail = `${item.detail} (adds the import)`;
       }
@@ -126,17 +126,6 @@ const completionProvider = {
     });
   },
 };
-
-// The line after the last import at the top of the file.
-function importInsertLine(document) {
-  let line = 0;
-  for (let i = 0; i < Math.min(document.lineCount, 200); i++) {
-    const text = document.lineAt(i).text;
-    if (/^\s*(import|from)\s/.test(text)) line = i + 1;
-    else if (text.trim() && !text.trim().startsWith("//") && line > 0) break;
-  }
-  return line;
-}
 
 const hoverProvider = {
   provideHover(document, position) {

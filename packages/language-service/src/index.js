@@ -776,6 +776,19 @@ function foldingRanges(source) {
   return ranges;
 }
 
+// The 0-based line where an automatic import should be inserted:
+// after the last import at the top of the file.
+function importInsertLine(source) {
+  const lines = source.split("\n");
+  let line = 0;
+  for (let i = 0; i < Math.min(lines.length, 200); i++) {
+    const text = lines[i];
+    if (/^\s*(import|from)\s/.test(text)) line = i + 1;
+    else if (text.trim() && !text.trim().startsWith("//") && line > 0) break;
+  }
+  return line;
+}
+
 // ---------------------------------------------------------------- formatting
 
 function format(source, file) {
@@ -793,4 +806,5 @@ module.exports = {
   foldingRanges,
   format,
   offsetAt,
+  importInsertLine,
 };

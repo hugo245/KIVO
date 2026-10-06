@@ -37,6 +37,7 @@ ${c.bold("Commands")}
   test [files...]        Run *.test.kivo files
   build [file]           Bundle a program into a single runnable file in dist/
   new <name>             Create a new project
+  lsp                    Start the language server (for editors, over stdio)
   version                Print the version
   help                   Show this help
 
@@ -374,7 +375,13 @@ async function cmdNew(args) {
 
 // ---------------------------------------------------------------- main
 
+async function cmdLsp() {
+  require("../../language-server/src").startServer();
+  return new Promise(() => {});
+}
+
 const COMMANDS = {
+  lsp: cmdLsp,
   run: cmdRun,
   dev: cmdDev,
   check: cmdCheck,

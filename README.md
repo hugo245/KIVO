@@ -304,6 +304,7 @@ kivo fmt [files...]    Format code (--check to only report)
 kivo test [files...]   Run *.test.kivo files
 kivo build [file]      Bundle a program into one file that runs with plain Node.js
 kivo new <name>        Create a new project
+kivo lsp               Start the language server (Neovim, Helix, Zed, ...)
 kivo --version
 kivo help
 ```
@@ -347,7 +348,7 @@ npm run vscode:install     # copies the extension into ~/.vscode/extensions
 npm run vscode:package     # creates dist/kivo-0.1.0.vsix
 ```
 
-See [docs/editor.md](docs/editor.md) for details and extension development.
+Other editors use the built-in language server: `kivo lsp`. See [docs/editor.md](docs/editor.md) for Neovim/Helix setup and extension development.
 
 ## Projects
 
@@ -404,7 +405,7 @@ KIVO runtime     packages/runtime     checked operations, values, errors, standa
 
 KIVO compiles to JavaScript and runs on Node's V8 engine, which makes it fast and gives it a mature async model and networking stack. The generated code never relies on JavaScript semantics for anything that could behave surprisingly: every operator, property access, call, loop and condition goes through a checked runtime helper that knows KIVO's rules and points back to the KIVO source. You never see or touch the generated JavaScript.
 
-The packages are separate on purpose: `packages/language-service` powers the editor without depending on VS Code, `packages/formatter` works on the AST, and the compiler backend can be replaced (bytecode VM, WebAssembly, native) without touching the front end. Details in [docs/architecture.md](docs/architecture.md).
+The packages are separate on purpose: `packages/language-service` powers both the VS Code extension and the LSP server without depending on either, `packages/formatter` works on the AST, and the compiler backend can be replaced (bytecode VM, WebAssembly, native) without touching the front end. Details in [docs/architecture.md](docs/architecture.md).
 
 ## Current status
 
@@ -414,6 +415,7 @@ KIVO is at **0.1** — a complete, working vertical slice, not a finished langua
 - standard library: `math`, `fs`, `path`, `json`, `time`, `process`, `env`, `random`, `crypto`, `http`, `web`, `database` (SQLite), `testing` — reference in [docs/stdlib.md](docs/stdlib.md)
 - CLI: `run`, `dev`, `check`, `fmt`, `test`, `build`, `new`
 - VS Code extension with diagnostics, completion, hover, definitions, formatting
+- a Language Server Protocol server (`kivo lsp`) for other editors
 - 110+ automated tests, including every example program
 
 Known limitations of 0.1:
@@ -425,7 +427,7 @@ Known limitations of 0.1:
 
 ## Roadmap
 
-- **0.2** — Language Server Protocol server (wrapping `packages/language-service`) for other editors, rename/references, type inference in the checker, WebSockets and sessions in `web`, multipart uploads
+- **0.2** — rename and find-references, type inference in the checker, WebSockets and sessions in `web`, multipart uploads
 - **0.3** — package manager (`kivo add`, `kivo remove`, `kivo update`, lockfile, registry), `match` expressions, interfaces
 - **Later** — generics, workers and concurrency, FFI, a bytecode VM or WebAssembly backend, native compilation
 

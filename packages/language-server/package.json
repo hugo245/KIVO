@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/language-server",
+  "version": "0.1.0",
+  "description": "Language Server Protocol server for KIVO (kivo lsp)",
+  "main": "src/index.js",
+  "license": "MIT"
+}

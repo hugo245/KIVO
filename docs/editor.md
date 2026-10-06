@@ -46,7 +46,43 @@ The extension also sets KIVO defaults for `.kivo` files: 4-space indentation, KI
 2. Run the **Run KIVO Extension** launch configuration (F5). It starts an Extension Development Host with the extension loaded straight from `packages/vscode-kivo` — the toolchain is resolved from the monorepo, so edits to the compiler or language service apply after reloading the window.
 3. The grammar is generated: edit `syntaxes/grammar.js`, then run `node packages/vscode-kivo/syntaxes/grammar.js`.
 
-## Other editors
+## Other editors (Language Server Protocol)
+
+`kivo lsp` starts a Language Server Protocol server over stdio. It provides diagnostics, completion (including automatic imports), hover, signature help, go to definition, formatting, document symbols and folding — the same features as the VS Code extension.
+
+**Neovim** (0.10+):
+
+```lua
+vim.filetype.add({ extension = { kivo = "kivo" } })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "kivo",
+  callback = function()
+    vim.lsp.start({ name = "kivo", cmd = { "kivo", "lsp" }, root_dir = vim.fs.root(0, { "kivo.toml", ".git" }) })
+  end,
+})
+```
+
+**Helix** (`languages.toml`):
+
+```toml
+[language-server.kivo]
+command = "kivo"
+args = ["lsp"]
+
+[[language]]
+name = "kivo"
+scope = "source.kivo"
+file-types = ["kivo"]
+comment-token = "//"
+indent = { tab-width = 4, unit = "    " }
+language-servers = ["kivo"]
+```
+
+**Zed, Sublime Text (LSP package), Emacs (eglot), JetBrains (LSP4IJ)**: configure a server with the command `kivo lsp` for `*.kivo` files.
+
+The TextMate grammar in `packages/vscode-kivo/syntaxes/kivo.tmLanguage.json` can be used by editors that support TextMate grammars for highlighting.
+
+### Embedding the language service
 
 All language intelligence is in [`packages/language-service`](../packages/language-service), which has no editor dependencies:
 
@@ -60,5 +96,3 @@ ls.signatureHelp(source, offset, file);
 ls.documentSymbols(source, file);
 ls.format(source, file);
 ```
-
-A Language Server Protocol wrapper (for Neovim, Zed, Helix, JetBrains, ...) is planned for 0.2. The TextMate grammar in `packages/vscode-kivo/syntaxes/kivo.tmLanguage.json` can be used by editors that support TextMate grammars (Sublime Text, JetBrains via TextMate bundles, GitHub's Linguist).
