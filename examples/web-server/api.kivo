@@ -1,0 +1,49 @@
+// A small JSON API: users stored in memory, with validation and errors.
+import web
+import env
+
+type NewUser {
+    username: string
+    coins?: int
+}
+
+let users = [
+    { id: 1, username: "Hugo", coins: 250 },
+    { id: 2, username: "Alex", coins: 100 }
+]
+let nextId = 3
+
+let app = web.app({ log: true })
+app.use(web.cors())
+app.static("/static", "./public")
+
+// Handlers can simply return a value: objects become JSON.
+app.get("/api/users", req => users)
+
+app.get("/api/users/:id", func(req) {
+    let id = number(req.params.id)
+    let user = users.find(u => u.id == id)
+    if user == null {
+        throw web.error(404, "User {id} not found")
+    }
+    return user
+})
+
+app.post("/api/users", func(req, res) {
+    let input = NewUser(req.body ?? {})
+    let user = { id: nextId, username: input.username, coins: input?.coins ?? 0 }
+    nextId += 1
+    users.push(user)
+    res.status(201).json(user)
+})
+
+app.delete("/api/users/:id", func(req, res) {
+    let id = number(req.params.id)
+    if not users.remove(users.find(u => u.id == id)) {
+        throw web.error(404, "User {id} not found")
+    }
+    res.status(204).send(null)
+})
+
+let port = number(env.get("PORT", "3000"))
+app.listen(port)

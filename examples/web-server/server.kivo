@@ -1,0 +1,17 @@
+import web
+
+let app = web.app()
+
+app.get("/", func(req, res) {
+    res.json({
+        message: "Hello from KIVO"
+    })
+})
+
+app.get("/hello/:name", func(req, res) {
+    res.json({
+        message: "Hello {req.params.name}"
+    })
+})
+
+app.listen(3000)

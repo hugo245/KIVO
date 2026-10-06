@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/parser",
+  "version": "0.1.0",
+  "description": "KIVO parser: turns tokens into an abstract syntax tree",
+  "main": "src/index.js",
+  "license": "MIT"
+}

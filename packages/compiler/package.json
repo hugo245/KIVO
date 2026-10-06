@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/compiler",
+  "version": "0.1.0",
+  "description": "KIVO compiler: turns the AST into code for the KIVO runtime",
+  "main": "src/index.js",
+  "license": "MIT"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/formatter",
+  "version": "0.1.0",
+  "description": "KIVO code formatter (kivo fmt)",
+  "main": "src/index.js",
+  "license": "MIT"
+}

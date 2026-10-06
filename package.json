@@ -1,0 +1,24 @@
+{
+  "name": "kivo",
+  "version": "0.1.0",
+  "description": "KIVO — a simple programming language that scales with you",
+  "license": "MIT",
+  "private": true,
+  "bin": {
+    "kivo": "packages/cli/bin/kivo.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "node --test tests/",
+    "kivo": "node packages/cli/bin/kivo.js",
+    "fmt:check": "node packages/cli/bin/kivo.js fmt --check examples tests/programs",
+    "vscode:build": "node scripts/build-vscode.js",
+    "vscode:package": "node scripts/build-vscode.js --package",
+    "vscode:install": "node scripts/build-vscode.js --install"
+  }
+}

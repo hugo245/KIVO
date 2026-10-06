@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/runtime",
+  "version": "0.1.0",
+  "description": "KIVO runtime: values, checked operations and the standard library",
+  "main": "src/index.js",
+  "license": "MIT"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/checker",
+  "version": "0.1.0",
+  "description": "KIVO static checker: names, imports, arity and literal type checks",
+  "main": "src/index.js",
+  "license": "MIT"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/lexer",
+  "version": "0.1.0",
+  "description": "KIVO lexer: turns source text into tokens",
+  "main": "src/index.js",
+  "license": "MIT"
+}

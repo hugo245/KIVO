@@ -1,0 +1,10 @@
+{
+  "name": "@kivo/cli",
+  "version": "0.1.0",
+  "description": "The kivo command line tool",
+  "bin": {
+    "kivo": "bin/kivo.js"
+  },
+  "main": "src/index.js",
+  "license": "MIT"
+}

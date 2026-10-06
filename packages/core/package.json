@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/core",
+  "version": "0.1.0",
+  "description": "KIVO engine: compiles and runs KIVO programs and modules",
+  "main": "src/index.js",
+  "license": "MIT"
+}

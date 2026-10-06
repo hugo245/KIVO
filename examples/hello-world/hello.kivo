@@ -1,0 +1,9 @@
+let name = "Hugo"
+
+func greet(name) {
+    print("Hello {name}")
+}
+
+for i in 1..3 {
+    greet(name)
+}
