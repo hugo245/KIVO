@@ -117,8 +117,11 @@ class Compiler {
           this.scope.declare(s.name.name, { kind: "type" });
           break;
         case N.ImportDeclaration:
-          if (s.specifiers) for (const sp of s.specifiers) this.scope.declare(sp.local.name, { kind: "import" });
-          else this.scope.declare(s.alias.name, { kind: "import" });
+          if (s.specifiers) {
+            // `from m import x` reads m.x on every use, so exported variables stay live
+            s.moduleTemp = this.temp();
+            for (const sp of s.specifiers) this.scope.declare(sp.local.name, { kind: "import", access: `${s.moduleTemp}[${JSON.stringify(sp.imported)}]` });
+          } else this.scope.declare(s.alias.name, { kind: "import" });
           break;
         default:
           break;
@@ -327,9 +330,9 @@ class Compiler {
     const l = this.loc(s, {}, s.sourceLoc);
     const load = s.isPath ? `(await $rt.importFile(${JSON.stringify(s.source)}, $file, ${l}))` : `(await $rt.importModule(${JSON.stringify(s.source)}, ${l}))`;
     if (!s.specifiers) return `const ${mangle(s.alias.name)} = ${load};`;
-    const m = this.temp();
-    const parts = s.specifiers.map((sp) => `${mangle(sp.local.name)} = $rt.importMember(${m}, ${JSON.stringify(sp.imported)}, ${this.loc(sp)})`);
-    return `${m} = ${load}; const ${parts.join(", ")};`;
+    const m = s.moduleTemp;
+    const checks = s.specifiers.map((sp) => `$rt.importMember(${m}, ${JSON.stringify(sp.imported)}, ${this.loc(sp)});`);
+    return `${m} = ${load}; ${checks.join(" ")}`;
   }
 
   // ------------------------------------------------------------ functions
@@ -496,7 +499,9 @@ class Compiler {
   // ------------------------------------------------------------ expressions
 
   resolve(id) {
-    if (this.scope.lookup(id.name)) return mangle(id.name);
+    const info = this.scope.lookup(id.name);
+    if (info && info.access) return info.access;
+    if (info) return mangle(id.name);
     if (this.builtinNames.has(id.name)) return `$B.${id.name}`;
     return `$rt.undefinedVariable(${JSON.stringify(id.name)}, ${this.loc(id)})`;
   }

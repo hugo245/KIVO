@@ -168,6 +168,7 @@ const FOREIGN_OPERATORS = [
   ["!==", "KIVO has no \"!==\". Use \"!=\" — it never converts types, so it is always strict."],
   ["&&", "KIVO uses \"and\" instead of \"&&\".\n\n    if loggedIn and isAdmin { ... }"],
   ["||", "KIVO uses \"or\" instead of \"||\".\n\n    if isAdmin or isOwner { ... }\n\nFor default values use \"??\":\n\n    let name = input ?? \"Unknown\""],
+  ["**", "KIVO has no \"**\" operator. Use math.pow:\n\n    import math\n    math.pow(2, 10)"],
   ["++", "KIVO has no \"++\" operator. Use \"+= 1\":\n\n    count += 1"],
   ["--", "KIVO has no \"--\" operator. Use \"-= 1\":\n\n    count -= 1"],
   ["!", "KIVO uses \"not\" instead of \"!\".\n\n    if not done { ... }"],

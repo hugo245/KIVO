@@ -450,6 +450,7 @@ class Parser {
     this.expect(T.LEFT_BRACE, '"{"');
     const fields = [];
     const methods = [];
+    this.inClass = (this.inClass || 0) + 1; // field initialisers may use self
     this.skipNewlines();
     while (!this.check(T.RIGHT_BRACE) && !this.check(T.EOF)) {
       const memberStart = this.startLoc();
@@ -466,9 +467,7 @@ class Parser {
         const isAsync = Boolean(this.match(T.ASYNC));
         this.expect(T.FUNC);
         const mname = this.identifier("a method name");
-        this.inClass = (this.inClass || 0) + 1;
         const fn = this.functionRest(isAsync);
-        this.inClass--;
         methods.push(this.node(N.FunctionDeclaration, { name: mname, params: fn.params, returnType: fn.returnType, body: fn.body, async: isAsync, exported: false, method: true }, memberStart));
       } else {
         throw this.error(`Unexpected ${describe(this.current)} in class body.`, this.current, "A class body contains fields and methods:\n\n    class Player {\n        let name\n        let coins = 0\n\n        func init(name) {\n            self.name = name\n        }\n    }");
@@ -476,6 +475,7 @@ class Parser {
       this.skipNewlines();
     }
     this.expect(T.RIGHT_BRACE, '"}"');
+    this.inClass--;
     return this.node(N.ClassDeclaration, { name, superClass, fields, methods, exported }, start);
   }
 

@@ -1,0 +1,5 @@
+export let count = 0
+
+export func increment() {
+    count += 1
+}

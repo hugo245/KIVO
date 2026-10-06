@@ -1,0 +1,16 @@
+from "./lib/counter.kivo" import count, increment
+import "./lib/counter.kivo" as counter
+
+print(count, counter.count)
+increment()
+increment()
+print(count, counter.count)
+
+class Greeter {
+    let name = "KIVO"
+    let greet = () => "Hello from {self.name}"
+}
+
+let g = Greeter()
+g.name = "a field initializer"
+print(g.greet())
