@@ -1,0 +1,2 @@
+// expect: This string is never closed.
+let s = "hello

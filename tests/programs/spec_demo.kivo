@@ -1,0 +1,26 @@
+const appName = "KIVO Demo"
+
+func greet(name: string) {
+    return "Hello {name}!"
+}
+
+let users = [
+    {
+        name: "Hugo",
+        coins: 250
+    },
+    {
+        name: "Alex",
+        coins: 100
+    }
+]
+
+print(appName)
+
+for user in users {
+    print(greet(user.name))
+
+    if user.coins >= 200 {
+        print("{user.name} has lots of coins")
+    }
+}

@@ -1,0 +1,28 @@
+["Hugo", "Alex", "Sam"] 3 3
+Hugo Hugo Sam
+true 2
+Hugo, Alex, Sam, Kim
+["Alex", "Sam"]
+["Alex", "Hugo", "Kim", "Sam"]
+["Kim", "Sam", "Alex", "Hugo"]
+17 1 8 4.25
+[5, 8]
+17
+[8, 5, 3, 1]
+5 true true
+[1, 2, 3] [1, 2, 3]
+[5, 3, 8, 1, 9] [5, 3, 8, 1, 0]
+Hugo 500 true
+{ name: "Hugo", coins: 501, admin: true, email: "hugo@example.com" }
+["name", "coins", "admin", "email"] 4
+true false
+Hugo default
+501
+a = 1
+b = 2
+7
+0 501
+4
+["Amy", "Zed", "Bob"]
+{ old: [{ name: "Zed", age: 30 }, { name: "Bob", age: 35 }], young: [{ name: "Amy", age: 25 }] }
+true true false

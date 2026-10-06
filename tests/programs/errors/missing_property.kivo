@@ -1,0 +1,4 @@
+// expect: "user" has no property "nmae".
+// expect: Did you mean "name"?
+let user = { name: "Hugo" }
+print(user.nmae)

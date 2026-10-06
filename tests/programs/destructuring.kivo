@@ -1,0 +1,18 @@
+let user = { name: "Hugo", coins: 250, admin: false }
+let { name, coins } = user
+print(name, coins)
+
+let { name: userName } = user
+print(userName)
+
+let [first, second] = ["a", "b"]
+print(first, second)
+
+let [head, ...tail] = [1, 2, 3, 4]
+print(head, tail)
+
+func minMax(items) {
+    return [items.min(), items.max()]
+}
+let [low, high] = minMax([4, 9, 1])
+print(low, high)

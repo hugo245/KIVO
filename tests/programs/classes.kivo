@@ -1,0 +1,62 @@
+class Player {
+    let name
+    let coins = 0
+
+    func init(name) {
+        self.name = name
+    }
+
+    func addCoins(amount) {
+        self.coins += amount
+    }
+
+    func describe() {
+        return "{self.name} has {self.coins} coins"
+    }
+}
+
+class Admin extends Player {
+    let level = 1
+
+    func init(name, level) {
+        super.init(name)
+        self.level = level
+    }
+
+    func describe() {
+        return super.describe() + " (admin level {self.level})"
+    }
+}
+
+class Counter {
+    let value = 0
+
+    func increment() {
+        self.value += 1
+        return self
+    }
+}
+
+let player = Player("Hugo")
+player.addCoins(100)
+print(player.coins)
+print(player.describe())
+print(player)
+
+let admin = Admin("Sam", 3)
+admin.addCoins(5)
+print(admin.describe())
+print(type(admin), isinstance(admin, Player), isinstance(player, Admin))
+
+let c = Counter()
+c.increment().increment().increment()
+print(c.value)
+
+let describe = player.describe
+print(describe())
+
+let team = [Player("A"), Player("B")]
+for p in team {
+    p.addCoins(10)
+}
+print(team.map(p => p.coins).sum())

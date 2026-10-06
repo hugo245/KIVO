@@ -1,0 +1,3 @@
+// expect: Unknown module "maths".
+// expect: Did you mean "math"?
+import maths

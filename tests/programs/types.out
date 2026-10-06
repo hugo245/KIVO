@@ -1,0 +1,7 @@
+hugo
+a@b.c
+Value does not match type User: field "id" should be int, but is a string ("3").
+6
+value: x value: 5
+anonymous hugo
+Parameter "items" of total must be [int], but item 1 is a string ("two").

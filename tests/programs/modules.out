@@ -1,0 +1,12 @@
+4 3 5 true
+121 0.21
+12.1
+36.3
+{"name":"Hugo","tags":["a","b"],"active":true,"score":null}
+Hugo b true null
+{
+  "a": [
+    1,
+    2
+  ]
+}

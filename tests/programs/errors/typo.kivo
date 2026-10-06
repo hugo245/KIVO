@@ -1,0 +1,4 @@
+// expect: Unknown variable "uesr".
+// expect: Did you mean "user"?
+let user = { name: "Hugo" }
+print(uesr.name)

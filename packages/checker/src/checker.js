@@ -133,6 +133,8 @@ class Checker {
   // Pre-declare hoisted declarations (functions, classes, types) so they can
   // be referenced anywhere in the block; lets are declared in order.
   hoist(statements) {
+    // imports are processed first, wherever they appear in the file
+    for (const s of statements) if (s.type === N.ImportDeclaration) this.importDeclaration(s);
     for (const s of statements) {
       if (s.type === N.FunctionDeclaration) {
         this.declare(s.name, "func", { node: s, signature: this.signature(s, s.name.name), params: s.params, hoisted: true, exported: s.exported, doc: this.docComment(s) });
@@ -251,7 +253,7 @@ class Checker {
         this.expr(s.iterable);
         this.block(s.body, () => {
           if (s.key) this.declare(s.key, "let", { typeText: s.iterable.type === N.RangeExpression ? null : isObjectish(s.iterable) ? "string" : "int" });
-          this.declare(s.value, "let", { typeText: s.iterable.type === N.RangeExpression ? "int" : null });
+          this.declare(s.value, "let", { typeText: s.iterable.type === N.RangeExpression ? "int" : null, iterableNode: s.key && !isObjectish(s.iterable) ? null : s.iterable, loopKey: Boolean(s.key) });
         });
         break;
       case N.WhileStatement:
@@ -278,8 +280,7 @@ class Checker {
         if (s.finalizer) this.block(s.finalizer);
         break;
       case N.ImportDeclaration:
-        this.importDeclaration(s);
-        break;
+        break; // handled by hoist()
       case N.BreakStatement:
       case N.ContinueStatement:
         break;
@@ -452,13 +453,41 @@ class Checker {
     }
   }
 
+  typeResolvable(t) {
+    switch (t.type) {
+      case N.TypeName:
+        return BUILTIN_TYPES.includes(t.name) || Boolean(this.scope.lookup(t.name));
+      case N.NullableType:
+        return this.typeResolvable(t.inner);
+      case N.ArrayType:
+        return this.typeResolvable(t.element);
+      case N.UnionType:
+        return t.types.every((x) => this.typeResolvable(x));
+      default:
+        return false;
+    }
+  }
+
   // Detects literal values that can never match a type annotation.
   checkLiteralType(value, type, what) {
     const actual = literalType(value);
     if (!actual) return;
+    if (!this.typeResolvable(type)) return; // unknown type names are reported separately
     if (!literalMatches(actual, value, type)) {
       let hint = null;
       const t = typeText(type);
+      const element = arrayElementType(type);
+      if (actual === "array" && element) {
+        const bad = value.elements.find((e) => {
+          const et = literalType(e);
+          return et && !literalMatches(et, e, element);
+        });
+        if (bad) {
+          const bt = literalType(bad);
+          this.report(bad, `${what} must be ${t}, but this array contains ${bt === "null" ? "null" : (/^[aeiou]/.test(bt) ? "an " : "a ") + bt}.`, null, { kind: "type" });
+          return;
+        }
+      }
       if (actual === "string" && /^(int|float|number)\??$/.test(t)) hint = `Convert the text to a number:\n\n    number(${this.text(value)})`;
       if ((actual === "int" || actual === "float") && /^string\??$/.test(t)) hint = `Convert the number to text:\n\n    string(${this.text(value)})`;
       if (actual === "float" && /^int\??$/.test(t)) hint = `${this.text(value)} is not a whole number. Use float or number as the type, or round it.`;
@@ -852,6 +881,12 @@ function literalMatches(actual, node, type) {
     default:
       return true;
   }
+}
+
+function arrayElementType(type) {
+  if (type.type === N.ArrayType) return type.element;
+  if (type.type === N.NullableType) return arrayElementType(type.inner);
+  return null;
 }
 
 function typeText(t) {

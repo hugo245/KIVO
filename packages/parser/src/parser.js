@@ -547,6 +547,11 @@ class Parser {
       throw this.error(`"${keyword}" needs a condition before "{".`, this.current, `    ${keyword} count > 0 {`);
     }
     const test = this.expression();
+    if (this.check(T.EQUAL)) {
+      throw this.error(`Unexpected "=" in the ${keyword} condition.`, this.current, `To compare values use "==":
+
+    ${keyword} ${this.source.slice(test.loc.start, test.loc.end)} == ... {`);
+    }
     if (this.check(T.COLON)) {
       throw this.error(`KIVO uses braces for blocks, not ":".`, this.current, `    ${keyword} ... {\n        ...\n    }`);
     }
@@ -1148,8 +1153,9 @@ class Parser {
 function parse(source, { file = null, recover = false } = {}) {
   let tokens;
   let comments;
+  let lexErrors = [];
   try {
-    ({ tokens, comments } = tokenize(source, file));
+    ({ tokens, comments, errors: lexErrors } = tokenize(source, file, { tolerant: recover }));
   } catch (err) {
     if (recover && err instanceof KivoCompileError) {
       return { program: { type: N.Program, body: [], comments: [], loc: { start: 0, end: 0, line: 1, column: 1 } }, errors: err.diagnostics, comments: [] };
@@ -1159,7 +1165,17 @@ function parse(source, { file = null, recover = false } = {}) {
   const parser = new Parser(tokens, { file, source, recover });
   const program = parser.parseProgram();
   program.comments = comments;
-  if (recover) return { program, errors: parser.errors, comments };
+  if (recover) {
+    // the lexer and the parser may both report the same broken token
+    const seen = new Set();
+    const errors = [...lexErrors, ...parser.errors].filter((d) => {
+      const key = `${d.line}:${d.column}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    return { program, errors, comments };
+  }
   return program;
 }
 

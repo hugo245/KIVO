@@ -1,0 +1,2 @@
+// expect: Cannot find the file "./missing.kivo".
+from "./missing.kivo" import thing

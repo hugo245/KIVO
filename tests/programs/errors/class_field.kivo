@@ -1,0 +1,8 @@
+// expect: Player has no field "nmae".
+// expect: Did you mean "name"?
+class Player {
+    let name
+}
+let p = Player()
+let field = "nmae"
+p[field] = "x"

@@ -1,0 +1,77 @@
+{
+  "Function": {
+    "prefix": "func",
+    "body": ["func ${1:name}(${2}) {", "\t$0", "}"],
+    "description": "Function declaration"
+  },
+  "Async function": {
+    "prefix": "async func",
+    "body": ["async func ${1:name}(${2}) {", "\t$0", "}"],
+    "description": "Async function declaration"
+  },
+  "If": {
+    "prefix": "if",
+    "body": ["if ${1:condition} {", "\t$0", "}"],
+    "description": "If statement"
+  },
+  "If / else": {
+    "prefix": "ifelse",
+    "body": ["if ${1:condition} {", "\t$2", "} else {", "\t$0", "}"],
+    "description": "If / else statement"
+  },
+  "For in": {
+    "prefix": "for",
+    "body": ["for ${1:item} in ${2:items} {", "\t$0", "}"],
+    "description": "Loop over items"
+  },
+  "For range": {
+    "prefix": "fori",
+    "body": ["for ${1:i} in ${2:0}..<${3:count} {", "\t$0", "}"],
+    "description": "Loop over a range of numbers"
+  },
+  "While": {
+    "prefix": "while",
+    "body": ["while ${1:condition} {", "\t$0", "}"],
+    "description": "While loop"
+  },
+  "Class": {
+    "prefix": "class",
+    "body": ["class ${1:Name} {", "\tlet ${2:value}", "", "\tfunc init(${2:value}) {", "\t\tself.${2:value} = ${2:value}", "\t}$0", "}"],
+    "description": "Class declaration"
+  },
+  "Type": {
+    "prefix": "type",
+    "body": ["type ${1:Name} {", "\t${2:id}: ${3:int}", "}"],
+    "description": "Type declaration"
+  },
+  "Try / catch": {
+    "prefix": "try",
+    "body": ["try {", "\t$1", "} catch ${2:error} {", "\tprint(${2:error}.message)", "}"],
+    "description": "Try / catch"
+  },
+  "Web server": {
+    "prefix": "webapp",
+    "body": [
+      "import web",
+      "",
+      "let app = web.app()",
+      "",
+      "app.get(\"/\", func(req, res) {",
+      "\tres.json({ message: \"${1:Hello from KIVO}\" })",
+      "})",
+      "",
+      "app.listen(${2:3000})"
+    ],
+    "description": "Minimal web server"
+  },
+  "Route": {
+    "prefix": "route",
+    "body": ["app.${1|get,post,put,patch,delete|}(\"${2:/path}\", func(req, res) {", "\t$0", "})"],
+    "description": "Web route"
+  },
+  "Test": {
+    "prefix": "test",
+    "body": ["test(\"${1:does something}\", func() {", "\t$0", "})"],
+    "description": "Test case (from testing import test)"
+  }
+}

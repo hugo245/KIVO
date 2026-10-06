@@ -1,0 +1,2 @@
+// expect: Uncaught error: Something went wrong
+throw "Something went wrong"

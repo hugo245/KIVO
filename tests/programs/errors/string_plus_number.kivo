@@ -1,0 +1,4 @@
+// expect: Cannot add a string and a number.
+// expect: number(age) + 2
+let age = "5"
+let total = age + 2

@@ -1,0 +1,5 @@
+node_modules/
+dist/
+packages/vscode-kivo/kivo/
+*.vsix
+.DS_Store

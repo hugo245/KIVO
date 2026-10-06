@@ -1,0 +1,5 @@
+// expect: "user" is null, so "name" cannot be accessed.
+// expect: errors/null_access.kivo:5:12
+// expect: if user != null {
+let user = null
+print(user.name)

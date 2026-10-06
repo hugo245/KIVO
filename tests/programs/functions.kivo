@@ -1,0 +1,58 @@
+func add(a, b) {
+    return a + b
+}
+
+func multiply(a: float, b: float) -> float {
+    return a * b
+}
+
+func greet(name = "World") {
+    return "Hello, {name}!"
+}
+
+func sum(...numbers) {
+    let total = 0
+    for n in numbers {
+        total += n
+    }
+    return total
+}
+
+func makeCounter() {
+    let count = 0
+    return func() {
+        count += 1
+        return count
+    }
+}
+
+func fib(n: int) -> int {
+    if n < 2 {
+        return n
+    }
+    return fib(n - 1) + fib(n - 2)
+}
+
+let double = x => x * 2
+let square = func(x) {
+    return x * x
+}
+let apply = (f, value) => f(value)
+
+print(add(2, 3))
+print(multiply(2.5, 4))
+print(greet(), greet("KIVO"))
+print(sum(), sum(1, 2, 3, 4))
+let counter = makeCounter()
+counter()
+counter()
+print(counter())
+print(fib(20))
+print(double(21), square(9), apply(double, 5))
+print([1, 2, 3].map(x => x * 10))
+print(isEven(4), isEven(7))
+
+// functions are hoisted
+func isEven(n) {
+    return n % 2 == 0
+}

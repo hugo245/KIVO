@@ -1,0 +1,19 @@
+import math
+
+export const taxRate = 0.21
+
+export func calculatePrice(value) {
+    return math.round(value * (1 + taxRate), 2)
+}
+
+export class Cart {
+    let items = []
+
+    func add(price) {
+        self.items.push(price)
+    }
+
+    func total() {
+        return calculatePrice(self.items.sum())
+    }
+}

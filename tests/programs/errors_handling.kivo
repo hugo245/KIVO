@@ -1,0 +1,51 @@
+try {
+    throw "Something went wrong"
+} catch error {
+    print("caught:", error.message)
+}
+
+try {
+    let user = null
+    print(user.name)
+} catch error {
+    print("kind:", error.kind)
+    print("line:", error.line)
+}
+
+func risky(n) {
+    if n > 2 {
+        throw { message: "too big", code: 42 }
+    }
+    return n
+}
+
+try {
+    risky(1)
+    risky(5)
+} catch e {
+    print(e.message, e.value.code)
+} finally {
+    print("finally runs")
+}
+
+try {
+    number("abc")
+} catch e {
+    print(e.message)
+}
+
+func safeDivide(a, b) {
+    try {
+        return a / b
+    } catch e {
+        return null
+    }
+}
+print(safeDivide(10, 2), safeDivide(1, 0))
+
+let user = null
+print(user?.name)
+print(user?.name ?? "Unknown")
+let profile = { name: "Hugo" }
+print(profile?.name, profile?.email ?? "no email")
+print(profile?.address?.city ?? "no city")

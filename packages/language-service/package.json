@@ -1,0 +1,7 @@
+{
+  "name": "@kivo/language-service",
+  "version": "0.1.0",
+  "description": "Editor-agnostic KIVO language intelligence: diagnostics, completion, hover, definitions",
+  "main": "src/index.js",
+  "license": "MIT"
+}

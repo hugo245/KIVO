@@ -1,0 +1,19 @@
+import math
+import json
+from "./lib/utils.kivo" import calculatePrice, Cart, taxRate as rate
+import "./lib/utils.kivo" as utils
+
+print(math.sqrt(16), math.floor(3.7), math.max(1, 5, 3), math.pi > 3)
+print(calculatePrice(100), rate)
+print(utils.calculatePrice(10))
+
+let cart = Cart()
+cart.add(10)
+cart.add(20)
+print(cart.total())
+
+let text = json.stringify({ name: "Hugo", tags: ["a", "b"], active: true, score: null })
+print(text)
+let data = json.parse(text)
+print(data.name, data.tags[1], data.active, data.score)
+print(json.pretty({ a: [1, 2] }))

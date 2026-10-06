@@ -1,0 +1,5 @@
+// expect: Index 3 is out of range
+// expect: Valid indexes are 0 to 2.
+let items = [1, 2, 3]
+let i = 3
+print(items[i])

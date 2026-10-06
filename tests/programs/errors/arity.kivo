@@ -1,0 +1,5 @@
+// expect: greet expects 1 argument, but is called with 2.
+func greet(name) {
+    print("Hello {name}")
+}
+greet("a", "b")

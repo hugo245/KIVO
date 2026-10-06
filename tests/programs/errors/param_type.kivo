@@ -1,0 +1,7 @@
+// expect: Parameter "age" of setAge must be int, but got a string ("18").
+// expect: number("18")
+func setAge(age: int) {
+    return age
+}
+let input = "18"
+setAge(input)

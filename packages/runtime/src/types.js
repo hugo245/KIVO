@@ -115,6 +115,13 @@ function check(value, type, what) {
     const problem = shapeProblem(value, type.type);
     detail = problem ? ` (${problem})` : "";
   }
+  const arrayType = type.kind === "nullable" ? type.inner : type;
+  if (arrayType.kind === "array" && Array.isArray(value)) {
+    const i = value.findIndex((v) => !matches(v, arrayType.element));
+    const bad = value[i];
+    const shownBad = typeof bad === "string" || typeof bad === "number" || typeof bad === "boolean" ? ` (${repr(bad, true)})` : "";
+    throw typeError(`${what} must be ${typeToString(type)}, but item ${i} is ${describeType(bad)}${shownBad}.`, null);
+  }
   const shown = typeof value === "string" || typeof value === "number" || typeof value === "boolean" ? ` (${repr(value, true)})` : "";
   throw typeError(`${what} must be ${typeToString(type)}, but got ${describeType(value)}${shown}${detail}.`, conversionHint(value, type));
 }

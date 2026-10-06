@@ -1,0 +1,4 @@
+// expect: KIVO uses "and" instead of "&&".
+let a = true
+if a && a {
+}

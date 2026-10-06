@@ -1,0 +1,14 @@
+from testing import test, equal, ok, throws
+from "./lib/utils.kivo" import calculatePrice
+
+test("calculates prices with tax", func() {
+    equal(calculatePrice(100), 121)
+})
+
+test("ok and throws", func() {
+    ok(1 < 2)
+    throws(func() {
+        let x = null
+        print(x.name)
+    }, "null")
+})

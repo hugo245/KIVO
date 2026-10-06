@@ -99,8 +99,10 @@ function readBody(req, limit) {
     req.on("data", (chunk) => {
       size += chunk.length;
       if (size > limit) {
+        // stop buffering; the connection is closed after the 413 response is sent
+        req.removeAllListeners("data");
+        req.resume();
         reject(httpError(413, `Request body is larger than ${limit} bytes.`));
-        req.destroy();
         return;
       }
       chunks.push(chunk);
@@ -414,6 +416,10 @@ function createApp(rt, options) {
         e.status = 400;
       }
       if (e.status) {
+        if (e.status === 413) {
+          nodeRes.setHeader("connection", "close");
+          nodeRes.on("finish", () => nodeReq.destroy());
+        }
         if (!state.sent) {
           state.status = e.status;
           res._finish(e.status, "application/json; charset=utf-8", stringifyJson({ error: e.message }));
@@ -460,9 +466,42 @@ function cors(rt, options) {
   return fn;
 }
 
+// Member documentation for editor tooling (completion and hover).
+function describeMembers(obj) {
+  const META = Symbol.for("kivo.meta");
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (k.startsWith("_")) continue;
+    out[k] = typeof v === "function" && v[META] ? { kind: "func", sig: v[META].sig, doc: v[META].doc } : { kind: "value", sig: k, doc: "" };
+  }
+  return out;
+}
+
+function describe(rt) {
+  const fakeRes = { setHeader() {}, getHeader() {}, end() {} };
+  const response = describeMembers(createResponse(fakeRes, { method: "GET" }, { sent: false, status: 0 }));
+  response.sent = { kind: "value", sig: "sent: bool", doc: "True once a response was sent." };
+  const request = {
+    method: { kind: "value", sig: "method: string", doc: 'The HTTP method, like "GET" or "POST".' },
+    path: { kind: "value", sig: "path: string", doc: 'The URL path, like "/users/5".' },
+    url: { kind: "value", sig: "url: string", doc: "The full request URL including the query string." },
+    params: { kind: "value", sig: "params: object", doc: 'Route parameters: for "/users/:id", req.params.id.' },
+    query: { kind: "value", sig: "query: object", doc: "Query string values: for ?page=2, req.query.page." },
+    headers: { kind: "value", sig: "headers: object", doc: "Request headers (lowercase names)." },
+    cookies: { kind: "value", sig: "cookies: object", doc: "Cookies sent by the client." },
+    body: { kind: "value", sig: "body: any", doc: "The parsed request body: JSON becomes objects, forms become objects, text stays text." },
+    ip: { kind: "value", sig: "ip: string?", doc: "The client's IP address." },
+  };
+  const app = describeMembers(createApp(rt, {}));
+  app.port = { kind: "value", sig: "port: int?", doc: "The port the server listens on (after listen)." };
+  return { App: app, Request: request, Response: response };
+}
+
 module.exports = (rt) =>
   defineModule("web", "A small, fast web framework for APIs and websites.", {
     app: native("app(options?: object) -> App", "Creates a web application. Options: { bodyLimit (bytes, default 1 MB), log (bool), quiet (bool) }.", (options) => createApp(rt, options)),
     cors: native("cors(options?: object) -> func", 'CORS middleware: app.use(web.cors()). Options: { origin ("*" or a list), methods, headers, credentials }.', (options) => cors(rt, options)),
     error: native("error(status: int, message?: string) -> error", 'An HTTP error to throw from a handler: throw web.error(404, "User not found")', httpError),
   });
+
+module.exports.describe = describe;

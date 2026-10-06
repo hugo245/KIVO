@@ -235,6 +235,7 @@ function resetModules() {
 }
 
 module.exports = {
+  checkerOptions,
   analyze,
   compileModule,
   compileToJs,

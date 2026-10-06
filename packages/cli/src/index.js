@@ -211,7 +211,15 @@ async function cmdTest(args) {
   const core = loadCore();
   let files;
   const explicit = args.filter((a) => !a.startsWith("--"));
-  if (explicit.length) files = targetFiles(explicit).filter((f) => f.endsWith(".kivo"));
+  if (explicit.length) {
+    files = [];
+    for (const p of explicit) {
+      const abs = path.resolve(p);
+      if (!fs.existsSync(abs)) fail(`Cannot find "${p}".`);
+      if (fs.statSync(abs).isDirectory()) files.push(...kivoFiles(abs, { tests: true }));
+      else files.push(abs);
+    }
+  }
   else {
     const root = core.findProjectRoot(process.cwd()) || process.cwd();
     files = kivoFiles(root, { tests: true });

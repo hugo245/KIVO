@@ -1,0 +1,5 @@
+// expect: Too much recursion: "loop" kept calling itself without stopping.
+func loop(n) {
+    return loop(n + 1)
+}
+loop(0)

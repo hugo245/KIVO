@@ -160,13 +160,15 @@ class Compiler {
   }
 
   compileStatements(statements) {
+    const imports = [];
     const hoisted = [];
     const rest = [];
     for (const s of statements) {
-      if (s.type === N.FunctionDeclaration) hoisted.push(this.functionDeclaration(s));
+      if (s.type === N.ImportDeclaration) imports.push(this.statement(s));
+      else if (s.type === N.FunctionDeclaration) hoisted.push(this.functionDeclaration(s));
       else rest.push(s);
     }
-    const out = [...hoisted];
+    const out = [...imports, ...hoisted];
     for (const s of rest) out.push(this.statement(s));
     return out.join("\n");
   }

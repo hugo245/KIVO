@@ -14,7 +14,7 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test tests/",
+    "test": "node --test tests/*.test.js",
     "kivo": "node packages/cli/bin/kivo.js",
     "fmt:check": "node packages/cli/bin/kivo.js fmt --check examples tests/programs",
     "vscode:build": "node scripts/build-vscode.js",

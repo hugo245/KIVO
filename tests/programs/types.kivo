@@ -1,0 +1,40 @@
+type User {
+    id: int
+    username: string
+    coins: int
+    email?: string
+}
+
+let user: User = { id: 1, username: "hugo", coins: 10 }
+print(user.username)
+
+let checked = User({ id: 2, username: "alex", coins: 5, email: "a@b.c" })
+print(checked.email)
+
+try {
+    let bad = User({ id: "3", username: "sam", coins: 0 })
+} catch e {
+    print(e.message)
+}
+
+func total(items: [int]) -> int {
+    return items.sum()
+}
+print(total([1, 2, 3]))
+
+func describe(value: string | int) -> string {
+    return "value: {value}"
+}
+print(describe("x"), describe(5))
+
+func maybe(name: string?) -> string {
+    return name ?? "anonymous"
+}
+print(maybe(null), maybe("hugo"))
+
+let mixed = [1, "two"]
+try {
+    total(mixed)
+} catch e {
+    print(e.message)
+}

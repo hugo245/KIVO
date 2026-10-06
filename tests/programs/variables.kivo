@@ -1,0 +1,19 @@
+let name = "Hugo"
+let age = 18
+const pi = 3.14159
+let username: string = "Hugo"
+let coins: int = 500
+let balance: float = 19.95
+let online: bool = true
+
+print(name, age, pi)
+print(username, coins, balance, online)
+
+coins += 100
+coins -= 50
+coins *= 2
+print(coins)
+
+let nothing = null
+print(nothing)
+print(type(name), type(age), type(online), type(nothing))

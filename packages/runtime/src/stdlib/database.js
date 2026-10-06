@@ -249,3 +249,21 @@ module.exports = (rt) =>
   defineModule("database", "SQL databases with safe, parameterized queries. Currently: SQLite.", {
     sqlite: native("sqlite(path: string) -> Database", 'Opens (or creates) a SQLite database file. Use ":memory:" for a temporary in-memory database.', (file) => openSqlite(rt, file)),
   });
+
+// Member documentation for editor tooling (completion and hover).
+module.exports.describe = (rt) => {
+  const META = Symbol.for("kivo.meta");
+  const members = (obj) => {
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) {
+      out[k] = typeof v === "function" && v[META] ? { kind: "func", sig: v[META].sig, doc: v[META].doc } : { kind: "value", sig: k, doc: "" };
+    }
+    return out;
+  };
+  const db = openSqlite(rt, ":memory:");
+  const table = db.table("example");
+  const query = table.where({ id: 1 });
+  const result = { Database: members(db), Table: members(table), Query: members(query) };
+  db.close();
+  return result;
+};

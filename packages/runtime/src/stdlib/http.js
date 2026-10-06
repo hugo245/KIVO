@@ -111,3 +111,11 @@ module.exports = () =>
       return request(String(options.method || "GET").toUpperCase(), options.url, options.body, options);
     }),
   });
+
+module.exports.describe = () => {
+  const META = Symbol.for("kivo.meta");
+  const r = makeResponse("", { status: 200, ok: true, statusText: "OK", headers: new Map() }, "");
+  const out = {};
+  for (const [k, v] of Object.entries(r)) out[k] = typeof v === "function" ? { kind: "func", sig: v[META].sig, doc: v[META].doc } : { kind: "value", sig: k, doc: { url: "The final URL.", status: "HTTP status code, like 200.", ok: "true when the status is 200-299.", statusText: 'Status text, like "OK".', headers: "Response headers (lowercase names).", body: "The response body as text." }[k] || "" };
+  return out;
+};

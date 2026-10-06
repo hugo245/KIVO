@@ -18,9 +18,13 @@ function isIdentPart(ch) {
 const OPENERS = { "(": ")", "[": "]", "{": "}" };
 
 class Lexer {
-  constructor(source, file = null) {
+  constructor(source, file = null, { tolerant = false } = {}) {
     this.source = source.replace(/^\uFEFF/, "");
     this.file = file;
+    // In tolerant mode (editor tooling) errors are collected instead of thrown
+    // wherever the lexer can sensibly continue.
+    this.tolerant = tolerant;
+    this.errors = [];
     this.pos = 0;
     this.line = 1;
     this.lineStart = 0;
@@ -31,6 +35,12 @@ class Lexer {
     // so long argument lists and arrays can span lines freely.
     this.brackets = [];
     this.pendingNewline = false;
+  }
+
+  // Records an error in tolerant mode, throws otherwise.
+  soft(err) {
+    if (!this.tolerant) throw err;
+    this.errors.push(...err.diagnostics);
   }
 
   error(message, start, length = 1, hint = null) {
@@ -88,7 +98,7 @@ class Lexer {
       if (tok.type === T.EOF) {
         if (this.brackets.length) {
           const open = this.openStack[this.openStack.length - 1];
-          throw this.error(`This "${open.ch}" is never closed.`, open.pos, 1, `Add a matching "${OPENERS[open.ch]}".`);
+          this.soft(this.error(`This "${open.ch}" is never closed.`, open.pos, 1, `Add a matching "${OPENERS[open.ch]}".`));
         }
         this.push(tok);
         return this.tokens;
@@ -185,7 +195,12 @@ class Lexer {
       if (this.source.startsWith(op, this.pos)) {
         if (op === "!" && this.peek(1) === "=") continue;
         if (op === "&" && this.peek(1) === "&") continue;
-        throw this.error(`"${op}" is not a KIVO operator.`, start, op.length, hint);
+        const err = this.error(`"${op}" is not a KIVO operator.`, start, op.length, hint);
+        const equivalent = { "&&": [T.AND, "and"], "||": [T.OR, "or"], "!": [T.NOT, "not"], "===": [T.EQUAL_EQUAL, "=="], "!==": [T.NOT_EQUAL, "!="] }[op];
+        if (!this.tolerant || !equivalent) throw err;
+        this.soft(err);
+        this.pos += op.length;
+        return this.make(equivalent[0], equivalent[1], start);
       }
     }
 
@@ -197,7 +212,11 @@ class Lexer {
       }
     }
 
-    throw this.error(`Unexpected character "${ch}".`, start, 1);
+    const err = this.error(`Unexpected character "${ch}".`, start, 1);
+    if (!this.tolerant) throw err;
+    this.soft(err);
+    this.pos++;
+    return this.next();
   }
 
   isLineStart(offset) {
@@ -216,12 +235,19 @@ class Lexer {
     } else if (text === ")" || text === "]" || text === "}") {
       const top = this.brackets[this.brackets.length - 1];
       if (top === undefined) {
-        throw this.error(`Unexpected "${text}" — there is nothing to close here.`, start, 1);
+        this.soft(this.error(`Unexpected "${text}" — there is nothing to close here.`, start, 1));
+        return;
       }
       if (OPENERS[top] !== text) {
         const open = this.openStack[this.openStack.length - 1];
         const { line } = this.positionOf(open.pos);
-        throw this.error(`Expected "${OPENERS[top]}" to close the "${top}" on line ${line}, but found "${text}".`, start, 1);
+        this.soft(this.error(`Expected "${OPENERS[top]}" to close the "${top}" on line ${line}, but found "${text}".`, start, 1));
+        // recover: close up to the matching opener if there is one
+        const idx = this.brackets.lastIndexOf(Object.keys(OPENERS).find((k) => OPENERS[k] === text));
+        if (idx < 0) return;
+        this.brackets.length = idx;
+        this.openStack.length = idx;
+        return;
       }
       this.brackets.pop();
       this.openStack.pop();
@@ -303,7 +329,8 @@ class Lexer {
       }
       if (ch === "\n") {
         if (!triple) {
-          throw this.error("This string is never closed.", start, 1, 'Strings must end on the same line. Add a closing ", or use """ for text spanning several lines.');
+          this.soft(this.error("This string is never closed.", start, 1, 'Strings must end on the same line. Add a closing ", or use """ for text spanning several lines.'));
+          break;
         }
         text += "\n";
         this.pos++;
@@ -439,10 +466,10 @@ function dedentParts(parts) {
   if (last && last.kind === "text") last.value = last.value.replace(/\n[ \t]*$/, "");
 }
 
-function tokenize(source, file = null) {
-  const lexer = new Lexer(source, file);
+function tokenize(source, file = null, options = {}) {
+  const lexer = new Lexer(source, file, options);
   const tokens = lexer.tokenize();
-  return { tokens, comments: lexer.comments };
+  return { tokens, comments: lexer.comments, errors: lexer.errors };
 }
 
 module.exports = { Lexer, tokenize };

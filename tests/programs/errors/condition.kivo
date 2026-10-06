@@ -1,0 +1,7 @@
+// expect: "count" is a number (0), but a condition must be true or false.
+// expect: if count != 0
+let count = 0
+let ref = count
+if ref == 0 and count {
+    print("never")
+}

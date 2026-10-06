@@ -1,0 +1,129 @@
+{
+  "name": "kivo",
+  "displayName": "KIVO",
+  "description": "KIVO language support: syntax highlighting, file icon, diagnostics, autocomplete, hover, go to definition, formatting and run commands.",
+  "version": "0.1.0",
+  "publisher": "kivo-lang",
+  "license": "MIT",
+  "icon": "icons/kivo.png",
+  "galleryBanner": {
+    "color": "#1E1838",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters",
+    "Snippets",
+    "Linters"
+  ],
+  "keywords": [
+    "kivo",
+    "programming language"
+  ],
+  "activationEvents": [
+    "onLanguage:kivo"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "kivo",
+        "aliases": [
+          "KIVO",
+          "kivo"
+        ],
+        "extensions": [
+          ".kivo"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/kivo-file.svg",
+          "dark": "./icons/kivo-file.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "kivo",
+        "scopeName": "source.kivo",
+        "path": "./syntaxes/kivo.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "kivo",
+        "path": "./snippets/kivo.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[kivo]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.defaultFormatter": "kivo-lang.kivo",
+        "editor.wordBasedSuggestions": "off",
+        "editor.suggest.showWords": false
+      }
+    },
+    "commands": [
+      {
+        "command": "kivo.run",
+        "title": "Run File",
+        "category": "KIVO",
+        "icon": "$(play)"
+      },
+      {
+        "command": "kivo.dev",
+        "title": "Run File and Restart on Changes",
+        "category": "KIVO"
+      },
+      {
+        "command": "kivo.check",
+        "title": "Check Project",
+        "category": "KIVO"
+      },
+      {
+        "command": "kivo.test",
+        "title": "Run Tests",
+        "category": "KIVO"
+      }
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "kivo.run",
+          "when": "resourceLangId == kivo",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "kivo.run",
+          "when": "editorLangId == kivo"
+        },
+        {
+          "command": "kivo.dev",
+          "when": "editorLangId == kivo"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "KIVO",
+      "properties": {
+        "kivo.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show KIVO errors and warnings while you type."
+        },
+        "kivo.command": {
+          "type": "string",
+          "default": "",
+          "description": "Command used to run KIVO in the terminal, e.g. \"kivo\". Leave empty to use the KIVO toolchain bundled with this extension (requires Node.js on your PATH)."
+        }
+      }
+    }
+  }
+}

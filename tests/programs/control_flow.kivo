@@ -1,0 +1,57 @@
+let coins = 150
+
+if coins > 100 {
+    print("Rich")
+} else {
+    print("Poor")
+}
+
+func grade(score) {
+    if score >= 90 {
+        return "A"
+    } else if score >= 80 {
+        return "B"
+    } else if score >= 70 {
+        return "C"
+    }
+    return "F"
+}
+print(grade(95), grade(85), grade(72), grade(10))
+
+for i in 1..5 {
+    if i == 2 {
+        continue
+    }
+    if i == 5 {
+        break
+    }
+    print("i =", i)
+}
+
+for i in 0..<3 {
+    print("exclusive", i)
+}
+
+let n = 3
+while n > 0 {
+    print("countdown", n)
+    n -= 1
+}
+
+let running = true
+let ticks = 0
+while running {
+    ticks += 1
+    if ticks >= 4 {
+        running = false
+    }
+}
+print("ticks:", ticks)
+
+for index, letter in ["a", "b", "c"] {
+    print(index, letter)
+}
+
+for ch in "hey" {
+    print(ch)
+}
