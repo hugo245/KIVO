@@ -5,6 +5,15 @@
   "version": "0.1.0",
   "publisher": "kivo-lang",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hugo245/kivo.git",
+    "directory": "packages/vscode-kivo"
+  },
+  "homepage": "https://github.com/hugo245/kivo#readme",
+  "bugs": {
+    "url": "https://github.com/hugo245/kivo/issues"
+  },
   "icon": "icons/kivo.png",
   "galleryBanner": {
     "color": "#1E1838",

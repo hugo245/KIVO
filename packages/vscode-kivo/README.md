@@ -2,8 +2,6 @@
 
 Language support for [KIVO](https://github.com/hugo245/kivo) — a simple programming language that scales with you.
 
-![KIVO](icons/kivo.png)
-
 ## Features
 
 - **KIVO language mode** — every `.kivo` file opens as KIVO (shown as `KIVO` in the language picker) with its own file icon. No JavaScript or TypeScript tooling ever touches these files.

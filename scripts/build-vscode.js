@@ -75,7 +75,7 @@ function vsixManifest() {
     <Identity Language="en-US" Id="${escapeXml(manifest.name)}" Version="${escapeXml(manifest.version)}" Publisher="${escapeXml(manifest.publisher)}" />
     <DisplayName>${escapeXml(manifest.displayName)}</DisplayName>
     <Description xml:space="preserve">${escapeXml(manifest.description)}</Description>
-    <Tags>${escapeXml((manifest.keywords || []).join(","))}</Tags>
+    <Tags>${escapeXml([...(manifest.keywords || []), ...manifest.contributes.languages.flatMap((l) => l.extensions.map((e) => "__ext_" + e.replace(/^\./, "")))].join(","))}</Tags>
     <Categories>${escapeXml(manifest.categories.join(","))}</Categories>
     <GalleryFlags>Public</GalleryFlags>
     <Properties>
@@ -84,6 +84,8 @@ function vsixManifest() {
       <Property Id="Microsoft.VisualStudio.Code.ExtensionPack" Value="" />
       <Property Id="Microsoft.VisualStudio.Code.ExtensionKind" Value="workspace" />
       <Property Id="Microsoft.VisualStudio.Code.LocalizedLanguages" Value="" />
+      <Property Id="Microsoft.VisualStudio.Code.ExecutesCode" Value="true" />
+      <Property Id="Microsoft.VisualStudio.Services.Links.Source" Value="${escapeXml(manifest.repository ? manifest.repository.url : "")}" />
       <Property Id="Microsoft.VisualStudio.Services.GitHubFlavoredMarkdown" Value="true" />
     </Properties>
     <License>extension/LICENSE.txt</License>
