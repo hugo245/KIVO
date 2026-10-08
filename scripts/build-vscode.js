@@ -134,24 +134,53 @@ function packageVsix() {
   return vsix;
 }
 
-function install() {
-  const targets = [path.join(os.homedir(), ".vscode", "extensions")];
-  const extra = process.argv.find((a) => a.startsWith("--dir="));
-  if (extra) targets.splice(0, 1, extra.slice(6));
-  for (const base of targets) {
-    const dest = path.join(base, `${extId}-${manifest.version}`);
-    fs.rmSync(dest, { recursive: true, force: true });
-    const files = extensionFiles();
-    for (const rel of files) {
-      const to = path.join(dest, rel);
-      fs.mkdirSync(path.dirname(to), { recursive: true });
-      fs.copyFileSync(path.join(EXT, rel), to);
+// Installs the .vsix through the editor's own command line, which registers the
+// extension properly (copying folders into ~/.vscode/extensions is not reliable
+// in recent VS Code versions).
+function editorClis() {
+  const names = ["code", "code-insiders", "cursor", "windsurf", "codium"];
+  const found = [];
+  const onPath = (name) => {
+    try {
+      execFileSync(process.platform === "win32" ? "where" : "which", [name], { stdio: "ignore" });
+      return true;
+    } catch {
+      return false;
     }
-    console.log(`✓ installed into ${dest}`);
+  };
+  for (const n of names) if (onPath(n)) found.push(n);
+  if (!found.length && process.platform === "darwin") {
+    const apps = [
+      "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code",
+      "/Applications/Cursor.app/Contents/Resources/app/bin/cursor",
+      "/Applications/Windsurf.app/Contents/Resources/app/bin/windsurf",
+      path.join(os.homedir(), "Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"),
+    ];
+    for (const a of apps) if (fs.existsSync(a)) found.push(a);
   }
-  console.log("Restart VS Code (or run “Developer: Reload Window”) to activate KIVO.");
+  return found;
+}
+
+function install(vsix) {
+  const clis = editorClis();
+  if (!clis.length) {
+    console.log("\nNo editor command line (code, cursor, ...) was found. Install the file by hand:");
+    console.log(`  1. In VS Code open the Extensions view (Cmd/Ctrl+Shift+X)`);
+    console.log(`  2. Click the ... menu at the top → "Install from VSIX..."`);
+    console.log(`  3. Choose ${vsix}`);
+    return;
+  }
+  for (const cli of clis) {
+    try {
+      execFileSync(cli, ["--install-extension", vsix, "--force"], { stdio: "inherit", shell: process.platform === "win32" });
+      console.log(`✓ installed with ${path.basename(cli)}`);
+    } catch {
+      console.log(`✗ ${cli} could not install the extension`);
+    }
+  }
+  console.log("Now reload the editor: Cmd/Ctrl+Shift+P → \"Developer: Reload Window\".");
 }
 
 bundleToolchain();
-if (process.argv.includes("--package")) packageVsix();
-if (process.argv.includes("--install")) install();
+if (process.argv.includes("--install")) install(packageVsix());
+else if (process.argv.includes("--package")) packageVsix();

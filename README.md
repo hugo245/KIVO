@@ -343,7 +343,7 @@ It keeps comments and verifies that the formatted program is identical to the or
 Install it from the repository:
 
 ```sh
-npm run vscode:install     # copies the extension into ~/.vscode/extensions
+npm run vscode:install     # builds the extension and installs it with `code --install-extension`
 # or build a .vsix and install it with "Extensions: Install from VSIX..."
 npm run vscode:package     # creates dist/kivo-0.1.0.vsix
 ```

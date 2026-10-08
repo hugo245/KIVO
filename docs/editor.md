@@ -9,7 +9,7 @@ The extension lives in [`packages/vscode-kivo`](../packages/vscode-kivo). It con
 From the repository root:
 
 ```sh
-npm run vscode:install      # copies the extension to ~/.vscode/extensions/kivo-lang.kivo-0.1.0
+npm run vscode:install      # builds dist/kivo-0.1.0.vsix and installs it with `code --install-extension`
 ```
 
 Then reload VS Code (`Developer: Reload Window`). Alternatively:
